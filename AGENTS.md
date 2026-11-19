@@ -28,3 +28,9 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+
+- Notes, links, AI chat history and board connections live in browser localStorage via `src/lib/notes-store.ts`; pure data rules sit in `src/lib/notes-model.ts` (tested). Why: no login yet, and keeping rules pure makes a later move to a cloud database a store-only change.
+- The AI assistant streams through the server route `src/routes/api/chat.ts`, which lazy-imports `src/lib/ai-chat.server.ts` (Lovable AI Gateway SDK). Why: keeps the SDK and key server-side.
+- AI charts are fenced ```chart JSON blocks rendered by `ChartBlock` inside `MarkdownView`, so charts work both in chat and in a note's preview. Why: one format the model can emit and the note can store as plain text.
