@@ -9,7 +9,43 @@ import { ChartBlock } from "./chart-block";
 import { getNoteMedia } from "@/lib/note-media-store";
 import { useEffect, useState } from "react";
 
-function StoredMedia({ id, alt, video = false }: { id: string; alt?: string; video?: boolean }) {\n  const [url, setUrl] = useState<string | null>(null);\n  useEffect(() => {\n    let active = true;\n    let objectUrl = "";\n    getNoteMedia(id).then((blob) => {\n      if (!active || !blob) return;\n      objectUrl = URL.createObjectURL(blob);\n      setUrl(objectUrl);\n    }).catch(() => setUrl(null));\n    return () => { active = false; if (objectUrl) URL.revokeObjectURL(objectUrl); };\n  }, [id]);\n  if (!url) return <div className="my-4 rounded-lg border border-border bg-secondary/60 px-4 py-6 text-center text-sm text-muted-foreground">{video ? "Carregando vídeo…" : "Carregando imagem…"}</div>;\n  if (video) return <video src={url} controls preload="metadata" playsInline className="my-4 max-h-[520px] w-full rounded-xl border border-border bg-black" />;\n  return <img src={url} alt={alt || "Imagem anexada"} loading="lazy" className="my-4 max-h-[600px] max-w-full rounded-lg border border-border object-contain" />;\n}\n\nfunction StoredMediaLink({ id, children }: { id: string; children: React.ReactNode }) {\n  const [url, setUrl] = useState<string | null>(null);\n  const [isVideo, setIsVideo] = useState(false);\n  useEffect(() => {\n    let active = true;\n    let objectUrl = "";\n    getNoteMedia(id).then((blob) => {\n      if (!active || !blob) return;\n      setIsVideo(blob.type.startsWith("video/"));\n      objectUrl = URL.createObjectURL(blob);\n      setUrl(objectUrl);\n    }).catch(() => setUrl(null));\n    return () => { active = false; if (objectUrl) URL.revokeObjectURL(objectUrl); };\n  }, [id]);\n  if (!url) return <span className="text-muted-foreground">{children} (mídia indisponível)</span>;\n  if (isVideo) return <video src={url} controls preload="metadata" playsInline className="my-4 max-h-[520px] w-full rounded-xl border border-border bg-black" />;\n  return <a href={url} download className="text-rose underline underline-offset-2">{children}</a>;\n}\n\nfunction videoEmbedUrl(raw?: string) {
+function StoredMedia({ id, alt, video = false }: { id: string; alt?: string; video?: boolean }) {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    let active = true;
+    let objectUrl = "";
+    getNoteMedia(id).then((blob) => {
+      if (!active || !blob) return;
+      objectUrl = URL.createObjectURL(blob);
+      setUrl(objectUrl);
+    }).catch(() => setUrl(null));
+    return () => { active = false; if (objectUrl) URL.revokeObjectURL(objectUrl); };
+  }, [id]);
+  if (!url) return <div className="my-4 rounded-lg border border-border bg-secondary/60 px-4 py-6 text-center text-sm text-muted-foreground">{video ? "Carregando vídeo…" : "Carregando imagem…"}</div>;
+  if (video) return <video src={url} controls preload="metadata" playsInline className="my-4 max-h-[520px] w-full rounded-xl border border-border bg-black" />;
+  return <img src={url} alt={alt || "Imagem anexada"} loading="lazy" className="my-4 max-h-[600px] max-w-full rounded-lg border border-border object-contain" />;
+}
+
+function StoredMediaLink({ id, children }: { id: string; children: React.ReactNode }) {
+  const [url, setUrl] = useState<string | null>(null);
+  const [isVideo, setIsVideo] = useState(false);
+  useEffect(() => {
+    let active = true;
+    let objectUrl = "";
+    getNoteMedia(id).then((blob) => {
+      if (!active || !blob) return;
+      setIsVideo(blob.type.startsWith("video/"));
+      objectUrl = URL.createObjectURL(blob);
+      setUrl(objectUrl);
+    }).catch(() => setUrl(null));
+    return () => { active = false; if (objectUrl) URL.revokeObjectURL(objectUrl); };
+  }, [id]);
+  if (!url) return <span className="text-muted-foreground">{children} (mídia indisponível)</span>;
+  if (isVideo) return <video src={url} controls preload="metadata" playsInline className="my-4 max-h-[520px] w-full rounded-xl border border-border bg-black" />;
+  return <a href={url} download className="text-rose underline underline-offset-2">{children}</a>;
+}
+
+function videoEmbedUrl(raw?: string) {
   if (!raw) return null;
   try {
     const url = new URL(raw);
@@ -42,6 +78,7 @@ export function MarkdownView({ source, className, style }: { source: string; cla
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkBreaks]}
         urlTransform={(url, key) => {
+          if (/^rosa-media:[a-z0-9-]+$/i.test(url)) return url;
           const safeData =
             /^data:(image\/(?:jpeg|png|gif|webp)|video\/(?:mp4|webm)|application\/pdf|text\/plain);base64,[A-Za-z0-9+/=]+$/.test(url);
           if (safeData && (key === "src" || key === "href")) return url;
