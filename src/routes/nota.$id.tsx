@@ -119,6 +119,27 @@ function NoteEditor({ note }: { note: Note }) {
     }
   }, [note.content]);
 
+  // Migrate older Base64 attachments out of note text into IndexedDB automatically.
+  useEffect(() => {
+    const legacyMedia = [...note.content.matchAll(/data:(?:image\\/(?:jpeg|png|gif|webp)|video\\/(?:mp4|webm|ogg)|application\\/pdf|text\\/plain);base64,[A-Za-z0-9+/=]+/g)].map((match) => match[0]);
+    if (legacyMedia.length === 0) return;
+    let cancelled = false;
+    void (async () => {
+      let migrated = note.content;
+      for (const dataUrl of [...new Set(legacyMedia)]) {
+        try {
+          const blob = await (await fetch(dataUrl)).blob();
+          const id = await saveNoteMedia(blob);
+          migrated = migrated.split(dataUrl).join(noteMediaRef(id));
+        } catch {
+          // Keep the original content intact if a legacy attachment cannot be migrated.
+        }
+      }
+      if (!cancelled && migrated !== note.content) saveContent(migrated);
+    })();
+    return () => { cancelled = true; };
+  }, [note.id, note.content]);
+
   useLayoutEffect(() => {
     const el = textRef.current;
     if (!el) return;
