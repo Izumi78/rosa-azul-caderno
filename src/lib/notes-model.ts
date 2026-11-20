@@ -2,6 +2,10 @@
 
 export type NoteColor = "roxo" | "azul" | "tinta";
 
+export type NoteFont = "serif" | "sans" | "mono";
+export type NotePaper = "cream" | "lavender" | "blue" | "dark";
+export interface NoteStyle { font: NoteFont; size: number; paper: NotePaper; }
+
 export interface NoteLink {
   id: string;
   url: string;
@@ -22,6 +26,7 @@ export interface Note {
   color: NoteColor;
   emoji?: string;
   coverImage?: string;
+  style?: NoteStyle;
   links: NoteLink[];
   chat: ChatMessage[];
   position: { x: number; y: number };
