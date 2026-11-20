@@ -2,6 +2,7 @@ const MAX_IMAGE_INPUT = 15 * 1024 * 1024;
 const TARGET_IMAGE_BYTES = 350 * 1024;
 const DATABASE_NAME = "rosa-azul-media";
 const STORE_NAME = "files";
+const DATABASE_VERSION = 2;
 const MAX_MEDIA_BYTES = 100 * 1024 * 1024;
 
 export interface StoredMedia {
@@ -15,7 +16,7 @@ export interface StoredMedia {
 function openMediaDatabase(): Promise<IDBDatabase> {
   if (typeof indexedDB === "undefined") return Promise.reject(new Error("Este navegador não oferece armazenamento local de arquivos."));
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DATABASE_NAME, 1);
+    const request = indexedDB.open(DATABASE_NAME, DATABASE_VERSION);
     request.onupgradeneeded = () => {
       const database = request.result;
       if (!database.objectStoreNames.contains(STORE_NAME)) database.createObjectStore(STORE_NAME, { keyPath: "id" });
