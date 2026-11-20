@@ -13,25 +13,25 @@ export function NoteCard({ note, links, index }: { note: Note; links: number; in
     <Link
       to="/nota/$id"
       params={{ id: note.id }}
-      className="group relative block aspect-square animate-fade-up focus-visible:outline-none"
+      className="group relative block min-h-[230px] animate-fade-up focus-visible:outline-none"
       style={{ animationDelay: `${Math.min(index, 12) * 45}ms` }}
     >
       <article
         className={cn(
-          "paper-ruled relative flex h-full flex-col overflow-hidden rounded-lg border border-border p-5 pl-16 shadow-paper transition-all duration-300 ease-out",
-          "group-hover:-translate-y-1.5 group-hover:-rotate-[0.6deg] group-hover:shadow-lift group-focus-visible:ring-2 group-focus-visible:ring-ring",
+          "rosa-note-glass paper-ruled relative flex h-full min-h-[230px] flex-col overflow-hidden rounded-2xl border border-border p-5 pl-14 shadow-paper transition-all duration-300 ease-out",
+          "group-hover:-translate-y-1 group-hover:-rotate-[0.35deg] group-hover:shadow-lift group-focus-visible:ring-2 group-focus-visible:ring-ring",
         )}
       >
         <span className={cn("absolute inset-y-0 left-0 w-2", NOTE_COLOR_BG[note.color])} />
-        <span className="absolute left-5 top-6 flex flex-col gap-5" aria-hidden="true">
+        <span className="absolute left-4 top-5 flex flex-col gap-4" aria-hidden="true">
           {[0, 1, 2, 3].map((i) => (
-            <span key={i} className="h-3 w-3 rounded-full border border-border bg-background shadow-inner" />
+            <span key={i} className="h-2.5 w-2.5 rounded-full border border-border bg-background shadow-inner" />
           ))}
         </span>
-        <h2 className="line-clamp-2 text-xl font-semibold leading-8 text-foreground sm:text-2xl">
+        <h2 className="line-clamp-2 text-lg font-semibold leading-7 text-foreground sm:text-xl">
           {note.title}
         </h2>
-        <p className="mt-1 line-clamp-4 font-serif text-[15px] leading-8 text-muted-foreground">
+        <p className="mt-1 line-clamp-3 font-serif text-[14px] leading-7 text-muted-foreground">
           {note.description || "Sem descrição"}
         </p>
         <div className="mt-auto flex items-center justify-between pt-3 text-xs text-muted-foreground">
