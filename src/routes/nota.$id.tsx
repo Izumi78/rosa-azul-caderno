@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Bold, Check, Code2, Eye, FileImage, Heading2, ImagePlus, Italic, Link2, List, PenLine, Quote, Sparkles, Trash2, Waypoints } from "lucide-react";
+import { ArrowLeft, Bold, Check, Code2, Eye, FileImage, Heading2, ImagePlus, Italic, Link2, List, ListOrdered, PenLine, Quote, Sparkles, Strikethrough, Trash2, Waypoints } from "lucide-react";
 import { useLayoutEffect, useMemo, useRef, useState, type ClipboardEvent } from "react";
 
 import { AiAssistant } from "@/components/ai-assistant";
@@ -92,7 +92,7 @@ function NoteEditor({ note }: { note: Note }) {
     notesActions.update(note.id, { content: value.slice(0, start) + before + selected + after + value.slice(end) });
     requestAnimationFrame(() => { if (el) { el.focus(); el.setSelectionRange(start + before.length, start + before.length + selected.length); } });
   };
-  const insertLinePrefix = (prefix: string) => {
+  const insertLink = () => {\n    const url = window.prompt("Cole ou digite o endereço do link:");\n    if (!url?.trim()) return;\n    const label = window.prompt("Texto que aparecerá no link:", url.trim()) || url.trim();\n    insertAtCursor("[", `](${url.trim()})`, label);\n  };\n  const insertLinePrefix = (prefix: string) => {
     const el = textRef.current, value = note.content, start = el?.selectionStart ?? value.length, lineStart = value.lastIndexOf("\n", Math.max(0, start - 1)) + 1;
     notesActions.update(note.id, { content: value.slice(0, lineStart) + prefix + value.slice(lineStart) });
     requestAnimationFrame(() => { if (el) { el.focus(); el.setSelectionRange(start + prefix.length, start + prefix.length); } });
@@ -203,7 +203,7 @@ function NoteEditor({ note }: { note: Note }) {
 <Button type="button" variant="ghost" size="icon" title="Título" aria-label="Título" onClick={() => insertLinePrefix("## ")}><Heading2 className="h-4 w-4" /></Button>
 <Button type="button" variant="ghost" size="icon" title="Lista" aria-label="Lista" onClick={() => insertLinePrefix("- ")}><List className="h-4 w-4" /></Button>
 <Button type="button" variant="ghost" size="icon" title="Citação" aria-label="Citação" onClick={() => insertLinePrefix("> ")}><Quote className="h-4 w-4" /></Button>
-<Button type="button" variant="ghost" size="icon" title="Código" aria-label="Código" onClick={() => insertAtCursor("`", "`")}><Code2 className="h-4 w-4" /></Button>
+<Button type="button" variant="ghost" size="icon" title="Riscado" aria-label="Riscado" onClick={() => insertAtCursor("~~", "~~")}><Strikethrough className="h-4 w-4" /></Button>\n<Button type="button" variant="ghost" size="icon" title="Código" aria-label="Código" onClick={() => insertAtCursor("`", "`")}><Code2 className="h-4 w-4" /></Button>\n<Button type="button" variant="ghost" size="icon" title="Lista numerada" aria-label="Lista numerada" onClick={() => insertLinePrefix("1. ")}><ListOrdered className="h-4 w-4" /></Button>\n<Button type="button" variant="ghost" size="icon" title="Checklist" aria-label="Checklist" onClick={() => insertLinePrefix("- [ ] ")}><Check className="h-4 w-4" /></Button>\n<Button type="button" variant="ghost" size="icon" title="Inserir link" aria-label="Inserir link" onClick={insertLink}><Link2 className="h-4 w-4" /></Button>\n<Button type="button" variant="ghost" size="icon" title="Separador" aria-label="Separador" onClick={() => insertLinePrefix("---\\n")}><span className="text-xs font-bold">—</span></Button>
 <span className="mx-1 h-5 w-px bg-border" />
 <Button type="button" variant="ghost" size="sm" className="gap-1.5" title="Inserir imagem ou arquivo" onClick={() => fileRef.current?.click()}><FileImage className="h-4 w-4" />Imagem/Arquivo</Button>
 <input ref={fileRef} type="file" accept="image/*,application/pdf,text/plain" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) addFileAttachment(file); e.currentTarget.value = ""; }} />
