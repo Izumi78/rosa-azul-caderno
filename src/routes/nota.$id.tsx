@@ -210,11 +210,7 @@ function NoteEditor({ note }: { note: Note }) {
           return;
         }
         const reference = await saveMediaFile(file);
-        saveContent(note.content + (note.content.endsWith("
-") ? "" : "
-
-") + "![Vídeo: " + name + "](" + reference + ")
-");
+        saveContent(note.content + (note.content.endsWith("\n") ? "" : "\n\n") + "![Vídeo: " + name + "](" + reference + ")\n");
         return;
       }
       if (file.size > 1024 * 1024) {
@@ -224,11 +220,7 @@ function NoteEditor({ note }: { note: Note }) {
       const reader = new FileReader();
       reader.onload = () => {
         const data = String(reader.result || "");
-        saveContent(note.content + (note.content.endsWith("
-") ? "" : "
-
-") + "[" + name + "](" + data + ")
-");
+        saveContent(note.content + (note.content.endsWith("\n") ? "" : "\n\n") + "[" + name + "](" + data + ")\n");
       };
       reader.readAsDataURL(file);
     } catch (error) {
