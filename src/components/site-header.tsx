@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { LayoutGrid, Waypoints, CalendarDays, Settings2 } from "lucide-react";
+import { LayoutGrid, Waypoints, CalendarDays, Settings2, Columns3 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Wordmark } from "./logo";
 import { ProfileAvatar } from "./profile-avatar";
@@ -23,6 +23,7 @@ export function SiteHeader() {
       <aside className="rosa-sidebar fixed bottom-0 left-0 top-[4.5rem] z-30 flex w-[5.25rem] flex-col items-center gap-2 border-r border-border/70 px-2 py-5">
         <Link to="/" activeOptions={{ exact: true }} className={itemClass} activeProps={{ className: "is-active" }}><LayoutGrid className="h-5 w-5" />Blocos</Link>
         <Link to="/mural" className={itemClass} activeProps={{ className: "is-active" }}><Waypoints className="h-5 w-5" />Mural</Link>
+        <Link to="/tarefas" className={itemClass} activeProps={{ className: "is-active" }}><Columns3 className="h-5 w-5" />Tarefas</Link>
         <Link to="/calendario" className={itemClass} activeProps={{ className: "is-active" }}><CalendarDays className="h-5 w-5" />Calendário</Link>
         <div className="my-2 h-px w-8 bg-border" />
         <div className="flex-1" />
