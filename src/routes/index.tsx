@@ -3,6 +3,7 @@ import { BookOpen, Download, Plus, Search, Upload, Waypoints } from "lucide-reac
 import { useMemo, useRef, useState } from "react";
 
 import { NewNoteDialog } from "@/components/new-note-dialog";
+import { HomeCalendar } from "@/components/home-calendar";
 import { NoteCard } from "@/components/note-card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -82,7 +83,7 @@ function Index() {
 
 
   return (
-    <div className="rosa-home mx-auto max-w-[1440px] px-5 pb-20 pt-7 sm:px-8">
+    <div className="rosa-home rosa-home-dark mx-auto max-w-[1440px] px-5 pb-20 pt-7 sm:px-8">
       <section className="rosa-home-hero flex flex-col items-center gap-5 text-center">
         <div className="max-w-3xl">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-rose">ROSA AZUL · ESPAÇO CRIATIVO</p>
@@ -107,6 +108,8 @@ function Index() {
           <div className="flex items-center gap-2"><Button type="button" variant="outline" className="h-11 rounded-full border-white/40 bg-white/35 shadow-sm backdrop-blur-lg" onClick={() => exportBackup(notes, connections)} disabled={!hydrated} title="Baixar cópia de segurança de todas as notas e conexões"><Download className="h-4 w-4" /> Backup</Button><Button type="button" variant="outline" className="h-11 rounded-full border-white/40 bg-white/35 shadow-sm backdrop-blur-lg" onClick={() => importRef.current?.click()} disabled={!hydrated} title="Restaurar backup JSON"><Upload className="h-4 w-4" /> Restaurar</Button><input ref={importRef} type="file" accept=".json,application/json" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) void importBackup(file); e.currentTarget.value = ""; }} /><NewNoteDialog /></div>
         </div>
       </section>
+
+      <HomeCalendar />
 
       <section className="rosa-workspace-summary mt-7 grid grid-cols-2 gap-3 sm:grid-cols-3">
         <div className="rosa-summary-tile">
