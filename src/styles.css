@@ -328,3 +328,124 @@
   .rosa-note-grid { gap: .9rem; }
   .rosa-note-glass { min-height: 205px; }
 }
+
+
+/* Rosa Azul — customizable glass tiles and neural mural */
+.rosa-home {
+  isolation: isolate;
+}
+.rosa-home-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 2rem;
+  border-color: color-mix(in oklab, var(--primary) 18%, var(--border));
+  background:
+    radial-gradient(ellipse at 12% 0%, oklch(0.9 0.08 310 / 40%), transparent 52%),
+    radial-gradient(ellipse at 88% 100%, oklch(0.88 0.09 245 / 45%), transparent 55%),
+    color-mix(in oklab, var(--paper) 68%, transparent);
+  box-shadow: 0 22px 60px -38px color-mix(in oklab, var(--primary) 48%, transparent), 0 1px 0 oklch(1 0 0 / 45%) inset;
+  backdrop-filter: blur(24px);
+}
+.rosa-home-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(130deg, oklch(1 0 0 / 26%), transparent 40%, oklch(1 0 0 / 8%));
+}
+.rosa-home-hero > * {
+  position: relative;
+  z-index: 1;
+}
+.rosa-note-grid > a,
+.rosa-note-grid > button {
+  min-width: 0;
+}
+.rosa-note-glass {
+  background-color: color-mix(in oklab, var(--paper) 72%, transparent);
+  border-color: color-mix(in oklab, white 34%, var(--primary) 20%);
+  box-shadow: 0 1px 0 oklch(1 0 0 / 45%) inset, 0 14px 36px -24px color-mix(in oklab, var(--primary) 32%, transparent);
+  backdrop-filter: blur(18px) saturate(1.15);
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+}
+.rosa-card-cover {
+  z-index: 0;
+  opacity: .42;
+  transition: transform .55s ease, opacity .35s ease;
+}
+.group:hover .rosa-card-cover {
+  transform: scale(1.045);
+  opacity: .52;
+}
+.rosa-card-overlay {
+  z-index: 1;
+  background: linear-gradient(180deg, color-mix(in oklab, var(--paper) 42%, transparent), color-mix(in oklab, var(--paper) 78%, transparent) 48%, color-mix(in oklab, var(--paper) 92%, transparent));
+}
+.rosa-card-title {
+  text-shadow: 0 1px 8px color-mix(in oklab, var(--paper) 55%, transparent);
+}
+.rosa-card-emoji {
+  box-shadow: 0 1px 0 oklch(1 0 0 / 40%) inset, 0 8px 20px -12px oklch(0.3 0.1 280 / 50%);
+}
+.rosa-create-card {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, oklch(1 0 0 / 24%), color-mix(in oklab, var(--accent) 18%, transparent));
+  backdrop-filter: blur(16px);
+  transition: transform .3s ease, box-shadow .3s ease, background .3s ease;
+}
+.rosa-create-card:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 18px 36px -24px color-mix(in oklab, var(--primary) 55%, transparent);
+}
+.rosa-mural-canvas {
+  background:
+    radial-gradient(ellipse at 12% 12%, oklch(0.84 0.1 300 / 22%), transparent 45%),
+    radial-gradient(ellipse at 82% 72%, oklch(0.84 0.1 245 / 25%), transparent 42%),
+    var(--background);
+}
+.rosa-synapse-wire {
+  filter: drop-shadow(0 0 4px color-mix(in oklab, var(--primary) 45%, transparent));
+  transition: stroke-width .25s ease, opacity .25s ease, filter .25s ease;
+}
+.rosa-synapse-pulse {
+  stroke-dasharray: 3 16;
+  animation: synapse-flow 3.2s linear infinite;
+  filter: drop-shadow(0 0 5px color-mix(in oklab, var(--accent) 75%, transparent));
+}
+.rosa-synapse-node {
+  stroke: oklch(1 0 0 / 75%);
+  stroke-width: 1.5px;
+  filter: drop-shadow(0 0 5px currentColor);
+  animation: synapse-breathe 2.8s ease-in-out infinite;
+}
+.rosa-mural-card {
+  background: color-mix(in oklab, var(--paper) 46%, transparent);
+  border-color: oklch(1 0 0 / 38%);
+  box-shadow: 0 1px 0 oklch(1 0 0 / 36%) inset, 0 16px 40px -28px color-mix(in oklab, var(--primary) 50%, transparent);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+}
+.rosa-mural-card-gloss {
+  background: linear-gradient(145deg, oklch(1 0 0 / 26%), color-mix(in oklab, var(--paper) 42%, transparent) 65%, oklch(1 0 0 / 10%));
+  pointer-events: none;
+  z-index: 1;
+}
+.rosa-note-customize {
+  box-shadow: 0 1px 0 oklch(1 0 0 / 30%) inset;
+}
+@keyframes synapse-flow {
+  to { stroke-dashoffset: -76; }
+}
+@keyframes synapse-breathe {
+  0%, 100% { opacity: .75; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.18); }
+}
+@media (max-width: 640px) {
+  .rosa-home-hero { padding: 1.25rem; border-radius: 1.4rem; }
+  .rosa-card-meta { font-size: 9px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rosa-synapse-pulse, .rosa-synapse-node { animation: none; }
+  .rosa-card-cover, .rosa-create-card { transition: none; }
+}
