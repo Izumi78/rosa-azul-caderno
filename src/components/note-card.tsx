@@ -13,7 +13,7 @@ export function NoteCard({ note, links, index }: { note: Note; links: number; in
     <Link
       to="/nota/$id"
       params={{ id: note.id }}
-      className="group relative block aspect-square w-full animate-fade-up focus-visible:outline-none"
+      className="group relative block h-[238px] w-full animate-fade-up focus-visible:outline-none sm:h-[248px]"
       style={{ animationDelay: `${Math.min(index, 12) * 45}ms` }}
     >
       <article
@@ -25,7 +25,7 @@ export function NoteCard({ note, links, index }: { note: Note; links: number; in
         <span className={cn("absolute inset-y-0 left-0 w-2", NOTE_COLOR_BG[note.color])} />
         {note.coverImage && <img src={note.coverImage} alt="" className="rosa-card-cover absolute inset-0 h-full w-full object-cover" />}
         <span className="rosa-card-overlay absolute inset-0" />
-        <span className="rosa-card-emoji absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-xl border border-white/30 bg-white/25 text-xl shadow-sm backdrop-blur-lg" aria-hidden="true">{note.emoji || "🌷"}</span>
+        <span className="rosa-card-emoji absolute right-3 top-3 z-10 flex h-12 w-12 items-center justify-center rounded-2xl border border-white/35 bg-white/25 text-2xl shadow-sm backdrop-blur-lg" aria-hidden="true">{note.emoji || "🌷"}</span>
         <span className="absolute left-3 top-4 z-10 flex flex-col gap-3" aria-hidden="true">
           {[0, 1, 2, 3].map((i) => (
             <span key={i} className="h-2.5 w-2.5 rounded-full border border-border bg-background shadow-inner" />
