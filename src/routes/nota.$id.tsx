@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Bold, Check, Code2, Eye, FileImage, Heading2, ImagePlus, Italic, Link2, List, ListOrdered, PenLine, Quote, Sparkles, Strikethrough, Trash2, Waypoints, Undo2, Redo2, Table, SlidersHorizontal, Search, FileText } from "lucide-react";
+import { ArrowLeft, Bold, Check, Code2, Eye, FileImage, Heading2, ImagePlus, Italic, Link2, List, ListOrdered, PenLine, Quote, Sparkles, Strikethrough, Trash2, Waypoints, Undo2, Redo2, Table, SlidersHorizontal, Search, FileText, PanelRightClose, PanelRightOpen } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ClipboardEvent } from "react";
 
 import { AiAssistant } from "@/components/ai-assistant";
@@ -76,6 +76,7 @@ function NoteEditor({ note }: { note: Note }) {
   const [mode, setMode] = useState<"write" | "view">("write");
   const [customizeOpen, setCustomizeOpen] = useState(false);
   const [noteSearch, setNoteSearch] = useState("");
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const style = note.style || { font: "serif" as const, size: 18, paper: "cream" as const };
   const fontFamily = style.font === "sans" ? "Manrope, system-ui, sans-serif" : style.font === "mono" ? "ui-monospace, monospace" : "Literata, Georgia, serif";
   const paperColors = { cream: "var(--paper)", lavender: "oklch(0.96 0.035 300)", blue: "oklch(0.96 0.035 245)", dark: "oklch(0.24 0.02 285)" };
@@ -240,7 +241,7 @@ function NoteEditor({ note }: { note: Note }) {
   };
 
   return (
-    <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[minmax(0,1fr)_400px]">
+    <div className={cn("mx-auto grid max-w-7xl gap-6 px-4 py-6 sm:px-6 transition-all", sidebarCollapsed ? "lg:grid-cols-1" : "lg:grid-cols-[minmax(0,1fr)_400px]")}>
       <nav className="rosa-note-switcher lg:col-span-2" aria-label="Navegação rápida entre blocos">
         <div className="flex flex-wrap items-center justify-between gap-3 px-3 pt-3">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[.16em] text-violet-200/75"><FileText className="h-4 w-4" /> Seus blocos</div>
@@ -273,6 +274,7 @@ function NoteEditor({ note }: { note: Note }) {
             </span>
             <ColorPicker value={note.color} onChange={(color) => notesActions.update(note.id, { color })} />
             <Button type="button" variant={customizeOpen ? "secondary" : "ghost"} size="sm" className="gap-1" onClick={() => setCustomizeOpen((v) => !v)}><SlidersHorizontal className="h-4 w-4" />Personalizar</Button>
+            <Button type="button" variant="outline" size="sm" className="gap-1" onClick={() => setSidebarCollapsed((v) => !v)} title={sidebarCollapsed ? "Mostrar painel lateral" : "Recolher painel lateral"} aria-label={sidebarCollapsed ? "Mostrar painel lateral" : "Recolher painel lateral"}>{sidebarCollapsed ? <PanelRightOpen className="h-4 w-4" /> : <PanelRightClose className="h-4 w-4" />}{sidebarCollapsed ? "Painel" : "Recolher"}</Button>
             <div className="flex rounded-full border border-border bg-paper p-0.5">
               <ModeButton active={mode === "write"} onClick={() => setMode("write")} icon={PenLine} label="Escrever" />
               <ModeButton active={mode === "view"} onClick={() => setMode("view")} icon={Eye} label="Visualizar" />
@@ -382,7 +384,7 @@ function NoteEditor({ note }: { note: Note }) {
         </article>
       </div>
 
-      <aside className="flex h-[80vh] min-h-0 flex-col overflow-hidden rounded-lg border border-border bg-sidebar shadow-paper animate-slide-in-right lg:sticky lg:top-20 lg:h-[calc(100vh-6.5rem)]">
+      {!sidebarCollapsed && <aside className="flex h-[80vh] min-h-0 flex-col overflow-hidden rounded-lg border border-border bg-sidebar shadow-paper animate-slide-in-right lg:sticky lg:top-20 lg:h-[calc(100vh-6.5rem)]">
         <Tabs defaultValue="ia" className="flex min-h-0 flex-1 flex-col gap-0">
           <TabsList className="m-3 grid grid-cols-3 bg-secondary">
             <TabsTrigger value="ia" className="gap-1.5">
@@ -406,7 +408,7 @@ function NoteEditor({ note }: { note: Note }) {
             <ConnectionsPanel note={note} related={related} all={state.notes} />
           </TabsContent>
         </Tabs>
-      </aside>
+      </aside>}
     </div>
   );
 }
