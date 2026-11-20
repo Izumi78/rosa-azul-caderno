@@ -86,13 +86,21 @@ function NoteEditor({ note }: { note: Note }) {
   }, [note.content, mode]);
 
   const words = note.content.trim() ? note.content.trim().split(/\s+/).length : 0;
+  const readingMinutes = Math.max(1, Math.ceil(words / 200));
+  const characters = note.content.length;
   const insertAtCursor = (before: string, after = before, placeholder = "texto") => {
     const el = textRef.current, value = note.content, start = el?.selectionStart ?? value.length, end = el?.selectionEnd ?? value.length;
     const selected = value.slice(start, end) || placeholder;
     notesActions.update(note.id, { content: value.slice(0, start) + before + selected + after + value.slice(end) });
     requestAnimationFrame(() => { if (el) { el.focus(); el.setSelectionRange(start + before.length, start + before.length + selected.length); } });
   };
-  const insertLink = () => {\n    const url = window.prompt("Cole ou digite o endereço do link:");\n    if (!url?.trim()) return;\n    const label = window.prompt("Texto que aparecerá no link:", url.trim()) || url.trim();\n    insertAtCursor("[", `](${url.trim()})`, label);\n  };\n  const insertLinePrefix = (prefix: string) => {
+  const insertLink = () => {
+    const url = window.prompt("Cole ou digite o endereço do link:");
+    if (!url?.trim()) return;
+    const label = window.prompt("Texto que aparecerá no link:", url.trim()) || url.trim();
+    insertAtCursor("[", "](" + url.trim() + ")", label);
+  };
+  const insertLinePrefix = (prefix: string) => {
     const el = textRef.current, value = note.content, start = el?.selectionStart ?? value.length, lineStart = value.lastIndexOf("\n", Math.max(0, start - 1)) + 1;
     notesActions.update(note.id, { content: value.slice(0, lineStart) + prefix + value.slice(lineStart) });
     requestAnimationFrame(() => { if (el) { el.focus(); el.setSelectionRange(start + prefix.length, start + prefix.length); } });
@@ -203,7 +211,12 @@ function NoteEditor({ note }: { note: Note }) {
 <Button type="button" variant="ghost" size="icon" title="Título" aria-label="Título" onClick={() => insertLinePrefix("## ")}><Heading2 className="h-4 w-4" /></Button>
 <Button type="button" variant="ghost" size="icon" title="Lista" aria-label="Lista" onClick={() => insertLinePrefix("- ")}><List className="h-4 w-4" /></Button>
 <Button type="button" variant="ghost" size="icon" title="Citação" aria-label="Citação" onClick={() => insertLinePrefix("> ")}><Quote className="h-4 w-4" /></Button>
-<Button type="button" variant="ghost" size="icon" title="Riscado" aria-label="Riscado" onClick={() => insertAtCursor("~~", "~~")}><Strikethrough className="h-4 w-4" /></Button>\n<Button type="button" variant="ghost" size="icon" title="Código" aria-label="Código" onClick={() => insertAtCursor("`", "`")}><Code2 className="h-4 w-4" /></Button>\n<Button type="button" variant="ghost" size="icon" title="Lista numerada" aria-label="Lista numerada" onClick={() => insertLinePrefix("1. ")}><ListOrdered className="h-4 w-4" /></Button>\n<Button type="button" variant="ghost" size="icon" title="Checklist" aria-label="Checklist" onClick={() => insertLinePrefix("- [ ] ")}><Check className="h-4 w-4" /></Button>\n<Button type="button" variant="ghost" size="icon" title="Inserir link" aria-label="Inserir link" onClick={insertLink}><Link2 className="h-4 w-4" /></Button>\n<Button type="button" variant="ghost" size="icon" title="Separador" aria-label="Separador" onClick={() => insertLinePrefix("---\\n")}><span className="text-xs font-bold">—</span></Button>
+<Button type="button" variant="ghost" size="icon" title="Riscado" aria-label="Riscado" onClick={() => insertAtCursor("~~", "~~")}><Strikethrough className="h-4 w-4" /></Button>
+<Button type="button" variant="ghost" size="icon" title="Código" aria-label="Código" onClick={() => insertAtCursor("`", "`")}><Code2 className="h-4 w-4" /></Button>
+<Button type="button" variant="ghost" size="icon" title="Lista numerada" aria-label="Lista numerada" onClick={() => insertLinePrefix("1. ")}><ListOrdered className="h-4 w-4" /></Button>
+<Button type="button" variant="ghost" size="icon" title="Checklist" aria-label="Checklist" onClick={() => insertLinePrefix("- [ ] ")}><Check className="h-4 w-4" /></Button>
+<Button type="button" variant="ghost" size="icon" title="Inserir link" aria-label="Inserir link" onClick={insertLink}><Link2 className="h-4 w-4" /></Button>
+<Button type="button" variant="ghost" size="icon" title="Separador" aria-label="Separador" onClick={() => insertLinePrefix("---\\n")}><span className="text-xs font-bold">—</span></Button>
 <span className="mx-1 h-5 w-px bg-border" />
 <Button type="button" variant="ghost" size="sm" className="gap-1.5" title="Inserir imagem ou arquivo" onClick={() => fileRef.current?.click()}><FileImage className="h-4 w-4" />Imagem/Arquivo</Button>
 <input ref={fileRef} type="file" accept="image/*,application/pdf,text/plain" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) addFileAttachment(file); e.currentTarget.value = ""; }} />
@@ -213,10 +226,15 @@ function NoteEditor({ note }: { note: Note }) {
                 value={note.content}
                 onChange={(e) => notesActions.update(note.id, { content: e.target.value })}
                 onPaste={handlePaste}
+                onKeyDown={(e) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "b") { e.preventDefault(); insertAtCursor("**", "**"); } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "i") { e.preventDefault(); insertAtCursor("*", "*"); } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") { e.preventDefault(); insertLink(); } }}
                 placeholder="Comece a escrever… (dica: use # para títulos, - para listas)"
                 aria-label="Conteúdo da página"
                 className="block min-h-[55vh] w-full resize-none overflow-hidden bg-transparent font-serif text-lg leading-8 text-foreground outline-none placeholder:text-muted-foreground/60"
               />
+              <div className="mt-2 flex flex-wrap items-center justify-between gap-2 border-t border-primary/10 pt-2 text-xs text-muted-foreground">
+                <span>{words} palavras · {characters} caracteres · leitura ~{readingMinutes} min</span>
+                <span>Atalhos: Ctrl+B negrito · Ctrl+I itálico · Ctrl+K link</span>
+              </div>
               </>
             ) : note.content.trim() ? (
               <MarkdownView source={note.content} className="text-lg" />
