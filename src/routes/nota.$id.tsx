@@ -1,12 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Bold, Check, Code2, Eye, FileImage, Heading2, ImagePlus, Italic, Link2, List, ListOrdered, PenLine, Quote, Sparkles, Strikethrough, Trash2, Waypoints, Undo2, Redo2, Table, SlidersHorizontal, Search, FileText, PanelRightClose, PanelRightOpen, LayoutDashboard } from "lucide-react";
+import { ArrowLeft, Bold, Check, Code2, Eye, FileImage, Heading2, ImagePlus, Italic, Link2, List, ListOrdered, PenLine, Quote, Sparkles, Strikethrough, Trash2, Waypoints, Undo2, Redo2, Table, SlidersHorizontal, Search, FileText, PanelRightClose, PanelRightOpen } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ClipboardEvent } from "react";
 
 import { AiAssistant } from "@/components/ai-assistant";
 import { ColorPicker } from "@/components/color-picker";
 import { LinksPanel } from "@/components/links-panel";
 import { MarkdownView } from "@/components/markdown-view";
-import { VisualLayoutEditor } from "@/components/visual-layout-editor";
 import { NOTE_COLOR_BG } from "@/components/note-colors";
 import {
   AlertDialog,
@@ -74,7 +73,7 @@ function NotePage() {
 function NoteEditor({ note }: { note: Note }) {
   const state = useNotesState();
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"write" | "view" | "layout">("write");
+  const [mode, setMode] = useState<"write" | "view">("write");
   const [customizeOpen, setCustomizeOpen] = useState(false);
   const [noteSearch, setNoteSearch] = useState("");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -278,7 +277,6 @@ function NoteEditor({ note }: { note: Note }) {
             <Button type="button" variant="outline" size="sm" className="gap-1" onClick={() => setSidebarCollapsed((v) => !v)} title={sidebarCollapsed ? "Mostrar painel lateral" : "Recolher painel lateral"} aria-label={sidebarCollapsed ? "Mostrar painel lateral" : "Recolher painel lateral"}>{sidebarCollapsed ? <PanelRightOpen className="h-4 w-4" /> : <PanelRightClose className="h-4 w-4" />}{sidebarCollapsed ? "Painel" : "Recolher"}</Button>
             <div className="flex rounded-full border border-border bg-paper p-0.5">
               <ModeButton active={mode === "write"} onClick={() => setMode("write")} icon={PenLine} label="Escrever" />
-              <ModeButton active={mode === "layout"} onClick={() => setMode("layout")} icon={LayoutDashboard} label="Layout" />
               <ModeButton active={mode === "view"} onClick={() => setMode("view")} icon={Eye} label="Prévia" />
             </div>
             <AlertDialog>
@@ -377,8 +375,6 @@ function NoteEditor({ note }: { note: Note }) {
                 <span>Atalhos: Ctrl+B negrito · Ctrl+I itálico · Ctrl+K link</span>
               </div>
               </>
-            ) : mode === "layout" ? (
-              <VisualLayoutEditor elements={note.layoutElements || []} onChange={(layoutElements) => notesActions.update(note.id, { layoutElements })} />
             ) : note.content.trim() ? (
               <MarkdownView source={note.content} className="leading-8" style={{ fontFamily, fontSize: `${style.size}px`, color: textColor }} />
             ) : (
