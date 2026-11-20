@@ -980,3 +980,173 @@
   .rosa-agenda-calendar { padding:.45rem; }
   .rosa-agenda-calendar { --cell-size:2.25rem; }
 }
+
+/* Midnight mirror finish — unified glass surfaces across the home shell */
+body:has(.rosa-home-dark) {
+  background-color: #0b0916;
+  background-image:
+    radial-gradient(ellipse at 8% 10%, oklch(0.38 0.17 300 / 18%), transparent 38%),
+    radial-gradient(ellipse at 92% 22%, oklch(0.34 0.16 255 / 16%), transparent 36%),
+    linear-gradient(145deg, #0b0916 0%, #100d20 52%, #090e1d 100%);
+  background-attachment: fixed;
+}
+body:has(.rosa-home-dark) .rosa-topbar {
+  border-color: oklch(1 0 0 / 9%);
+  background: linear-gradient(110deg, oklch(0.19 0.045 292 / 82%), oklch(0.12 0.035 270 / 76%));
+  box-shadow: 0 1px 0 oklch(1 0 0 / 5%) inset, 0 14px 36px -28px oklch(0.68 0.18 295 / 45%);
+}
+body:has(.rosa-home-dark) .rosa-sidebar {
+  border-color: oklch(1 0 0 / 9%);
+  background:
+    linear-gradient(160deg, oklch(0.2 0.05 292 / 88%), oklch(0.11 0.035 270 / 84%));
+  box-shadow: 1px 0 0 oklch(1 0 0 / 4%) inset, 16px 0 40px -34px oklch(0.65 0.18 295 / 65%);
+}
+body:has(.rosa-home-dark) .rosa-topbar,
+body:has(.rosa-home-dark) .rosa-sidebar {
+  backdrop-filter: blur(30px) saturate(1.55);
+  -webkit-backdrop-filter: blur(30px) saturate(1.55);
+}
+body:has(.rosa-home-dark) .rosa-topbar a,
+body:has(.rosa-home-dark) .rosa-topbar span,
+body:has(.rosa-home-dark) .rosa-sidebar .rosa-rail-link {
+  color: oklch(0.88 0.035 292);
+}
+body:has(.rosa-home-dark) .rosa-rail-link:hover,
+body:has(.rosa-home-dark) .rosa-rail-link.is-active {
+  color: #fff;
+  background: linear-gradient(135deg, oklch(0.62 0.19 295 / 26%), oklch(0.45 0.15 255 / 18%));
+  border: 1px solid oklch(0.82 0.12 295 / 24%);
+  box-shadow: 0 1px 0 oklch(1 0 0 / 12%) inset, 0 8px 24px -18px oklch(0.72 0.2 295 / 80%);
+}
+body:has(.rosa-home-dark) .rosa-settings-panel {
+  color: #f6f1ff;
+  border-color: oklch(1 0 0 / 13%);
+  background: linear-gradient(145deg, oklch(0.24 0.06 292 / 96%), oklch(0.13 0.04 270 / 97%));
+  box-shadow: 0 1px 0 oklch(1 0 0 / 10%) inset, 0 24px 70px -35px #05030d;
+  backdrop-filter: blur(30px) saturate(1.5);
+}
+body:has(.rosa-home-dark) .rosa-settings-panel p,
+body:has(.rosa-home-dark) .rosa-settings-panel button { color: #eee7ff; }
+.rosa-home-dark::before {
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 18% 10%, oklch(0.42 0.2 300 / 27%), transparent 42%),
+    radial-gradient(ellipse at 88% 28%, oklch(0.36 0.18 260 / 22%), transparent 40%),
+    radial-gradient(ellipse at 50% 100%, oklch(0.28 0.15 315 / 24%), transparent 50%),
+    linear-gradient(145deg, #0b0917 0%, #151027 48%, #090e1d 100%);
+}
+.rosa-home-dark .rosa-home-hero,
+.rosa-home-dark .rosa-agenda-panel,
+.rosa-home-dark .rosa-summary-tile,
+.rosa-home-dark .rosa-note-glass,
+.rosa-home-dark .rosa-create-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid oklch(1 0 0 / 15%);
+  background:
+    linear-gradient(145deg, oklch(1 0 0 / 10%), oklch(1 0 0 / 2%) 46%, oklch(0.55 0.15 295 / 7%)),
+    linear-gradient(135deg, oklch(0.28 0.07 292 / 78%), oklch(0.14 0.045 270 / 84%));
+  box-shadow:
+    0 1px 0 oklch(1 0 0 / 17%) inset,
+    1px 0 0 oklch(1 0 0 / 5%) inset,
+    0 22px 54px -34px oklch(0.68 0.2 295 / 48%),
+    0 8px 22px -18px #03020a;
+  backdrop-filter: blur(28px) saturate(1.5);
+  -webkit-backdrop-filter: blur(28px) saturate(1.5);
+}
+.rosa-home-dark .rosa-home-hero::after,
+.rosa-home-dark .rosa-agenda-panel::after,
+.rosa-home-dark .rosa-summary-tile::after,
+.rosa-home-dark .rosa-note-glass::before,
+.rosa-home-dark .rosa-create-card::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    linear-gradient(118deg, oklch(1 0 0 / 17%) 0%, oklch(1 0 0 / 5%) 18%, transparent 39%, transparent 72%, oklch(0.78 0.13 285 / 8%) 100%),
+    radial-gradient(ellipse at 12% 0%, oklch(1 0 0 / 10%), transparent 48%);
+  opacity: .9;
+}
+.rosa-home-dark .rosa-home-hero > *,
+.rosa-home-dark .rosa-agenda-panel > *,
+.rosa-home-dark .rosa-summary-tile > *,
+.rosa-home-dark .rosa-note-glass > *,
+.rosa-home-dark .rosa-create-card > * {
+  position: relative;
+  z-index: 1;
+}
+.rosa-home-dark .rosa-note-glass {
+  background:
+    radial-gradient(ellipse at 88% 0%, oklch(0.66 0.17 295 / 20%), transparent 48%),
+    linear-gradient(145deg, oklch(0.3 0.065 292 / 88%), oklch(0.15 0.045 270 / 91%));
+  border-color: oklch(0.88 0.1 295 / 24%);
+  box-shadow:
+    0 1px 0 oklch(1 0 0 / 19%) inset,
+    0 0 0 1px oklch(0.7 0.16 295 / 7%),
+    0 20px 46px -30px oklch(0.72 0.2 295 / 58%),
+    0 8px 24px -20px #020109;
+  transition: transform .32s ease, border-color .32s ease, box-shadow .32s ease;
+}
+.rosa-home-dark .rosa-note-glass::after {
+  z-index: 2;
+  opacity: .62;
+  background:
+    linear-gradient(125deg, oklch(1 0 0 / 19%), transparent 28%, transparent 68%, oklch(0.75 0.14 285 / 8%)),
+    linear-gradient(180deg, transparent 0%, oklch(0.11 0.035 280 / 12%) 38%, oklch(0.1 0.035 280 / 82%) 100%);
+}
+.rosa-home-dark .rosa-note-glass:hover {
+  transform: translateY(-5px) rotateX(1deg);
+  border-color: oklch(0.9 0.13 295 / 48%);
+  box-shadow:
+    0 1px 0 oklch(1 0 0 / 26%) inset,
+    0 0 0 1px oklch(0.75 0.18 295 / 13%),
+    0 28px 60px -30px oklch(0.72 0.2 295 / 70%),
+    0 0 32px -22px oklch(0.72 0.2 255 / 65%);
+}
+.rosa-home-dark .rosa-card-overlay {
+  background: linear-gradient(180deg, oklch(0.14 0.04 280 / 5%) 0%, oklch(0.14 0.04 280 / 12%) 36%, oklch(0.12 0.04 280 / 86%) 100%);
+}
+.rosa-home-dark .rosa-card-title {
+  color: #fff;
+  text-shadow: 0 2px 18px oklch(0.08 0.03 280 / 70%);
+}
+.rosa-home-dark .rosa-card-description,
+.rosa-home-dark .rosa-card-meta { color: oklch(0.83 0.035 292); }
+.rosa-home-dark .rosa-card-emoji {
+  color: #fff;
+  background: linear-gradient(145deg, oklch(1 0 0 / 18%), oklch(1 0 0 / 5%));
+  border-color: oklch(1 0 0 / 24%);
+  box-shadow: 0 1px 0 oklch(1 0 0 / 20%) inset, 0 8px 24px -14px #05020d;
+}
+.rosa-home-dark .rosa-create-card {
+  border-style: dashed;
+  border-color: oklch(0.78 0.15 295 / 42%);
+  color: oklch(0.9 0.07 292);
+}
+.rosa-home-dark .rosa-create-card:hover {
+  border-color: oklch(0.9 0.15 295 / 72%);
+  box-shadow: 0 0 34px -18px oklch(0.72 0.2 295 / 80%), 0 1px 0 oklch(1 0 0 / 15%) inset;
+}
+.rosa-home-dark .rosa-agenda-calendar,
+.rosa-home-dark .rosa-agenda-day,
+.rosa-home-dark .rosa-agenda-upcoming {
+  border-color: oklch(1 0 0 / 13%);
+  background:
+    linear-gradient(145deg, oklch(1 0 0 / 7%), oklch(1 0 0 / 2%)),
+    oklch(0.12 0.04 280 / 50%);
+  box-shadow: 0 1px 0 oklch(1 0 0 / 9%) inset, 0 14px 36px -30px oklch(0.7 0.18 295 / 40%);
+}
+@media (max-width: 640px) {
+  body:has(.rosa-home-dark) .rosa-sidebar {
+    background: linear-gradient(100deg, oklch(0.19 0.05 292 / 96%), oklch(0.11 0.035 270 / 96%));
+    border-top-color: oklch(1 0 0 / 12%);
+  }
+  .rosa-home-dark::before { inset: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rosa-home-dark .rosa-note-glass { transition: none; }
+}
