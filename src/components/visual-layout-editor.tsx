@@ -14,23 +14,27 @@ export type VisualElement = {
 };
 
 function MediaPreview({ reference }: { reference: string }) {
-  const [url, setUrl] = useState("");
-  const [type, setType] = useState("");
+  const [media, setMedia] = useState<{ url: string; type: string } | null>(null);
+  const [failed, setFailed] = useState(false);
   useEffect(() => {
     let active = true;
     let objectUrl = "";
+    setMedia(null);
+    setFailed(false);
     const id = getMediaId(reference);
-    if (!id) return;
-    getMediaFile(id).then((media) => {
-      if (!active || !media) return;
-      objectUrl = URL.createObjectURL(media.blob);
-      setUrl(objectUrl);
-      setType(media.type);
-    }).catch(() => {});
+    if (!id) { setFailed(true); return; }
+    getMediaFile(id).then((stored) => {
+      if (!active) return;
+      if (!stored) { setFailed(true); return; }
+      objectUrl = URL.createObjectURL(stored.blob);
+      setMedia({ url: objectUrl, type: stored.type });
+    }).catch(() => { if (active) setFailed(true); });
     return () => { active = false; if (objectUrl) URL.revokeObjectURL(objectUrl); };
   }, [reference]);
-  if (!url) return <div className="flex h-full items-center justify-center text-xs text-muted-foreground">Carregando mídia…</div>;
-  return type.startsWith("video/") ? <video src={url} controls className="h-full w-full rounded-lg bg-black object-contain" /> : <img src={url} alt="Mídia do layout" className="h-full w-full rounded-lg object-contain" />;
+  if (failed) return <div className="flex h-full items-center justify-center p-3 text-center text-xs text-muted-foreground">Não foi possível carregar este arquivo. Ele pode ter sido removido do armazenamento deste navegador.</div>;
+  if (!media) return <div className="flex h-full items-center justify-center text-xs text-muted-foreground">Carregando mídia…</div>;
+  if (media.type.startsWith("video/")) return <video src={media.url} controls preload="metadata" playsInline className="h-full w-full rounded-lg bg-black object-contain" />;
+  return <img src={media.url} alt="Mídia do layout" loading="lazy" className="h-full w-full rounded-lg object-contain" />;
 }
 
 export function VisualLayoutEditor({ elements = [], onChange }: { elements?: VisualElement[]; onChange: (next: VisualElement[]) => void }) {
