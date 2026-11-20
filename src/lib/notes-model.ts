@@ -19,7 +19,17 @@ export interface ChatMessage {
   content: string;
 }
 
-export interface VisualElement {\n  id: string;\n  type: "text" | "image" | "video";\n  x: number;\n  y: number;\n  width: number;\n  height: number;\n  content: string;\n}\n\nexport interface Note {
+export interface VisualElement {
+  id: string;
+  type: "text" | "image" | "video";
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  content: string;
+}
+
+export interface Note {
   id: string;
   title: string;
   description: string;
@@ -28,7 +38,8 @@ export interface VisualElement {\n  id: string;\n  type: "text" | "image" | "vid
   status?: TaskStatus;
   emoji?: string;
   coverImage?: string;
-  style?: NoteStyle;\n  layoutElements?: VisualElement[];
+  style?: NoteStyle;
+  layoutElements?: VisualElement[];
   links: NoteLink[];
   chat: ChatMessage[];
   position: { x: number; y: number };
@@ -188,7 +199,14 @@ export function sampleData(now = Date.now()): NotesData {
       color: "roxo",
       position: { x: 80, y: 80 },
       content:
-        "# Bem-vindo 🌹\n\nCada bloco é uma página inteira para escrever.\n\n- Use a aba **Links** para guardar referências.\n- Peça ajuda à **Íris** para organizar ideias, revisar textos, criar gráficos e relatórios.\n- No **Mural**, ligue blocos que tratam de assuntos parecidos.\n",
+        "# Bem-vindo 🌹
+
+Cada bloco é uma página inteira para escrever.
+
+- Use a aba **Links** para guardar referências.
+- Peça ajuda à **Íris** para organizar ideias, revisar textos, criar gráficos e relatórios.
+- No **Mural**, ligue blocos que tratam de assuntos parecidos.
+",
     }),
     base({
       id: "ideias-projeto",
@@ -196,7 +214,9 @@ export function sampleData(now = Date.now()): NotesData {
       description: "Rascunho solto de ideias para desenvolver depois.",
       color: "azul",
       position: { x: 440, y: 220 },
-      content: "- Um diário de leituras\n- Planejar viagem de fim de ano\n- Estudar sobre jardinagem",
+      content: "- Um diário de leituras
+- Planejar viagem de fim de ano
+- Estudar sobre jardinagem",
     }),
     base({
       id: "leituras",
