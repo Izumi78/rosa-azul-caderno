@@ -781,3 +781,87 @@
   .rosa-mural-stage::after { animation: none; }
   .rosa-mural-card { transition: none; }
 }
+
+
+/* macOS-inspired creative workspace shell */
+.rosa-topbar {
+  background: color-mix(in oklab, var(--background) 78%, transparent);
+  backdrop-filter: blur(24px) saturate(1.45);
+  -webkit-backdrop-filter: blur(24px) saturate(1.45);
+}
+.rosa-topbar-brand { position:absolute; left:50%; transform:translateX(-50%); }
+.rosa-sidebar {
+  background: color-mix(in oklab, var(--paper) 74%, transparent);
+  backdrop-filter: blur(24px) saturate(1.35);
+  -webkit-backdrop-filter: blur(24px) saturate(1.35);
+}
+.rosa-rail-link.is-active {
+  color: var(--primary);
+  background: color-mix(in oklab, var(--primary) 12%, var(--paper));
+  box-shadow: 0 1px 0 oklch(1 0 0 / 40%) inset;
+}
+.rosa-rail-link.is-active svg { filter: drop-shadow(0 0 7px color-mix(in oklab, var(--primary) 35%, transparent)); }
+.rosa-settings-panel {
+  background: color-mix(in oklab, var(--paper) 92%, transparent);
+  backdrop-filter: blur(26px) saturate(1.4);
+  -webkit-backdrop-filter: blur(26px) saturate(1.4);
+}
+.rosa-main-content { margin-left: 5.25rem; min-width:0; }
+.rosa-home { padding-top: 2rem; }
+.rosa-home-hero {
+  border-radius: 1.7rem;
+  background:
+    radial-gradient(ellipse at 15% 0%, oklch(0.82 0.12 292 / 20%), transparent 42%),
+    radial-gradient(ellipse at 90% 100%, oklch(0.82 0.1 245 / 18%), transparent 44%),
+    color-mix(in oklab, var(--paper) 70%, transparent);
+  backdrop-filter: blur(18px);
+}
+.rosa-note-glass {
+  background-color: color-mix(in oklab, var(--paper) 82%, white 18%);
+  background-image:
+    radial-gradient(circle at 88% 12%, color-mix(in oklab, var(--accent) 58%, transparent), transparent 42%),
+    linear-gradient(145deg, oklch(1 0 0 / 42%), transparent 58%);
+  border-color: color-mix(in oklab, var(--primary) 13%, var(--border));
+  box-shadow: 0 1px 0 oklch(1 0 0 / 58%) inset, 0 16px 42px -30px color-mix(in oklab, var(--primary) 45%, transparent);
+}
+.rosa-note-glass::after {
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  border-radius:inherit;
+  background:linear-gradient(125deg, oklch(1 0 0 / 18%), transparent 36%, transparent 70%, oklch(1 0 0 / 10%));
+}
+.rosa-create-card {
+  border-style: solid;
+  border-color: color-mix(in oklab, var(--primary) 20%, var(--border));
+  background: color-mix(in oklab, var(--paper) 50%, transparent);
+  backdrop-filter: blur(16px);
+}
+.rosa-grid-paper {
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--note-azul) 16%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--note-azul) 16%, transparent) 1px, transparent 1px),
+    radial-gradient(ellipse at 100% 0%, color-mix(in oklab, var(--primary) 5%, transparent), transparent 55%);
+  background-size: 24px 24px, 24px 24px, 100% 100%;
+  background-position: 0 0, 0 0, 0 0;
+}
+.rosa-grid-paper textarea { background:transparent; }
+.dark .rosa-note-glass { background-color: color-mix(in oklab, var(--card) 88%, transparent); }
+@media (max-width: 640px) {
+  .rosa-sidebar {
+    top:auto; right:0; bottom:0; left:0; width:100%; height:4.4rem;
+    flex-direction:row; justify-content:center; gap:.75rem; padding:.35rem .75rem;
+    border-top:1px solid var(--border); border-right:0;
+  }
+  .rosa-rail-link { width:4.2rem; padding:.4rem .2rem; }
+  .rosa-main-content { margin-left:0; padding-bottom:4.4rem; }
+  .rosa-settings-panel { bottom:5rem; left:auto; right:.75rem; }
+  .rosa-topbar { height:4rem; }
+  .rosa-topbar-brand .text-2xl { font-size:1.2rem; }
+  .rosa-home { padding-top:1rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rosa-rail-link { transition:none; }
+}
