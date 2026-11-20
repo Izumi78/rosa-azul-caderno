@@ -1463,3 +1463,98 @@ body:has(.rosa-home-dark) .rosa-settings-panel button { color: #eee7ff; }
   .rosa-kanban-page::before { inset: 4.5rem 0 4.5rem; }
   .rosa-kanban-column { min-height: 260px; }
 }
+
+
+/* Home opens directly into the notes library */
+.rosa-library-top {
+  position: relative;
+  padding: 1.25rem 1.35rem 1.1rem;
+  border: 1px solid oklch(1 0 0 / 15%);
+  border-radius: 1.5rem;
+  background:
+    linear-gradient(125deg, oklch(1 0 0 / 10%), transparent 42%, oklch(0.72 0.14 295 / 8%)),
+    linear-gradient(145deg, oklch(0.25 0.06 292 / 76%), oklch(0.13 0.04 270 / 86%));
+  box-shadow: 0 1px 0 oklch(1 0 0 / 17%) inset, 0 22px 54px -40px oklch(0.7 0.17 295 / 50%);
+  backdrop-filter: blur(26px) saturate(1.45);
+}
+.rosa-library-top .rosa-section-heading {
+  margin-top: 0;
+  padding: 0;
+}
+.rosa-library-top .rosa-section-heading h1 {
+  color: #fff;
+  font-size: clamp(1.65rem, 3vw, 2.25rem);
+  font-weight: 650;
+  letter-spacing: -.035em;
+}
+.rosa-library-top .rosa-section-heading > span {
+  color: oklch(0.82 0.045 290);
+}
+.rosa-library-top .rosa-home-actions { position: relative; z-index: 1; }
+.rosa-loading-screen {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 42%, oklch(0.42 0.17 295 / 24%), transparent 34%),
+    radial-gradient(ellipse at 18% 12%, oklch(0.32 0.14 260 / 16%), transparent 38%),
+    linear-gradient(145deg, #090812, #151027 54%, #090e1d);
+  color: oklch(0.9 0.045 292);
+  animation: rosa-loading-appear .45s ease both;
+}
+.rosa-loading-brand {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 1.6rem 2.4rem;
+  border: 1px solid oklch(1 0 0 / 17%);
+  border-radius: 1.8rem;
+  background: linear-gradient(145deg, oklch(1 0 0 / 11%), oklch(0.55 0.13 292 / 9%));
+  box-shadow: 0 1px 0 oklch(1 0 0 / 18%) inset, 0 22px 65px -32px oklch(0.7 0.18 295 / 55%);
+  backdrop-filter: blur(28px) saturate(1.5);
+  animation: rosa-loading-float 2.8s ease-in-out infinite;
+}
+.rosa-loading-brand > span:first-child { gap: .85rem; }
+.rosa-loading-brand svg { width: 3.4rem; height: 3.4rem; filter: drop-shadow(0 0 18px oklch(0.76 0.16 295 / 48%)); }
+.rosa-loading-brand .font-display { font-size: 2rem; color: white; }
+.rosa-loading-screen > p {
+  margin: 0;
+  color: oklch(0.78 0.045 292);
+  font-size: .78rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.rosa-loading-line {
+  display: block;
+  width: 9rem;
+  height: 2px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: oklch(1 0 0 / 10%);
+}
+.rosa-loading-line i {
+  display: block;
+  width: 38%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #9d78ed, #e4c7ff, #8f7cf5);
+  box-shadow: 0 0 12px oklch(0.75 0.16 295 / 70%);
+  animation: rosa-loading-progress 1.25s ease-in-out infinite;
+}
+@keyframes rosa-loading-appear { from { opacity: 0; } to { opacity: 1; } }
+@keyframes rosa-loading-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes rosa-loading-progress { from { transform: translateX(-110%); } to { transform: translateX(270%); } }
+@media (max-width: 640px) {
+  .rosa-library-top { padding: 1rem; border-radius: 1.2rem; }
+  .rosa-loading-brand { padding: 1.2rem 1.6rem; }
+  .rosa-loading-brand .font-display { font-size: 1.65rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rosa-loading-screen, .rosa-loading-brand, .rosa-loading-line i { animation: none; }
+}
