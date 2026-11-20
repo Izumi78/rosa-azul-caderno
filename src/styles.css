@@ -282,3 +282,47 @@
     animation: none;
   }
 }
+
+
+/* Rosa Azul — compact glass stationery */
+.rosa-home {
+  position: relative;
+}
+.rosa-home-hero {
+  padding: clamp(1rem, 2vw, 1.5rem);
+  border: 1px solid color-mix(in oklab, var(--primary) 12%, var(--border));
+  border-radius: 1.75rem;
+  background: linear-gradient(135deg, color-mix(in oklab, var(--paper) 88%, white), color-mix(in oklab, var(--accent) 24%, var(--paper)));
+  box-shadow: 0 16px 48px -30px color-mix(in oklab, var(--primary) 32%, transparent);
+}
+.rosa-note-grid {
+  align-items: stretch;
+}
+.rosa-note-glass {
+  background-color: color-mix(in oklab, var(--paper) 78%, white);
+  background-image:
+    linear-gradient(135deg, color-mix(in oklab, white 48%, transparent), transparent 65%),
+    var(--paper-ruled-image, none);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-color: color-mix(in oklab, var(--primary) 14%, var(--border));
+}
+.rosa-note-glass::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(140deg, color-mix(in oklab, white 26%, transparent), transparent 45%);
+  opacity: .45;
+}
+.rosa-create-card {
+  min-height: 230px;
+  border-radius: 1.5rem;
+  background: color-mix(in oklab, var(--paper) 40%, transparent);
+}
+@media (max-width: 640px) {
+  .rosa-home-hero { border-radius: 1.25rem; }
+  .rosa-note-grid { gap: .9rem; }
+  .rosa-note-glass { min-height: 205px; }
+}
