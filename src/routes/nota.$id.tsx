@@ -242,7 +242,7 @@ function NoteEditor({ note }: { note: Note }) {
 
   return (
     <div className={cn("mx-auto grid max-w-7xl gap-6 px-4 py-6 sm:px-6 transition-all", sidebarCollapsed ? "lg:grid-cols-1" : "lg:grid-cols-[minmax(0,1fr)_400px]")}>
-      <nav className="rosa-note-switcher lg:col-span-2" aria-label="Navegação rápida entre blocos">
+      <nav className={cn("rosa-note-switcher", sidebarCollapsed ? "lg:col-span-1" : "lg:col-span-2")} aria-label="Navegação rápida entre blocos">
         <div className="flex flex-wrap items-center justify-between gap-3 px-3 pt-3">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[.16em] text-violet-200/75"><FileText className="h-4 w-4" /> Seus blocos</div>
           <div className="relative w-full sm:w-56">
