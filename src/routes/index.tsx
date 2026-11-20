@@ -47,8 +47,8 @@ function Index() {
   const linkCount = (id: string) => connections.filter((c) => c.from === id || c.to === id).length;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 pb-20 pt-10 sm:px-6">
-      <section className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+    <div className="rosa-home mx-auto max-w-7xl px-4 pb-20 pt-8 sm:px-6">
+      <section className="rosa-home-hero flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
         <div className="max-w-xl">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-rose">Seu caderno</p>
           <h1 className="mt-2 text-4xl font-semibold leading-tight text-foreground sm:text-5xl">
@@ -73,7 +73,7 @@ function Index() {
         </div>
       </section>
 
-      <section className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <section className="rosa-note-grid mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {!hydrated &&
           Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className="aspect-square rounded-lg bg-secondary" />
@@ -87,7 +87,7 @@ function Index() {
             trigger={
               <button
                 type="button"
-                className="flex aspect-square animate-fade-up flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-border text-muted-foreground transition-colors hover:border-primary hover:bg-paper hover:text-primary"
+                className="rosa-create-card flex min-h-[230px] animate-fade-up flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-border text-muted-foreground transition-colors hover:border-primary hover:bg-paper hover:text-primary"
                 style={{ animationDelay: `${Math.min(filtered.length, 12) * 45}ms` }}
               >
                 <span className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary">
