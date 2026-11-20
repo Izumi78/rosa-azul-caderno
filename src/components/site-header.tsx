@@ -20,7 +20,7 @@ export function SiteHeader() {
         </Link>
         <span className="absolute right-5 hidden items-center gap-2 text-[10px] font-semibold uppercase tracking-[.18em] text-muted-foreground sm:flex"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_10px_2px_oklch(0.75_0.16_150_/_45%)]" /> seu espaço criativo</span>
       </header>
-      <aside className="rosa-sidebar fixed bottom-0 left-0 top-[4.5rem] z-30 flex w-[5.25rem] flex-col items-center gap-2 border-r border-border/70 px-2 py-5">
+      <aside className="rosa-sidebar fixed bottom-0 left-0 top-[4.5rem] z-30 flex w-[4.25rem] flex-col items-center gap-1.5 border-r border-border/70 px-1.5 py-4">
         <Link to="/" activeOptions={{ exact: true }} className={itemClass} activeProps={{ className: "is-active" }}><span className="rosa-rail-icon"><LayoutGrid className="h-5 w-5" /></span><span className="rosa-rail-label">Blocos</span></Link>
         <Link to="/mural" className={itemClass} activeProps={{ className: "is-active" }}><span className="rosa-rail-icon"><Waypoints className="h-5 w-5" /></span><span className="rosa-rail-label">Mural</span></Link>
         <Link to="/tarefas" className={itemClass} activeProps={{ className: "is-active" }}><span className="rosa-rail-icon"><Columns3 className="h-5 w-5" /></span><span className="rosa-rail-label">Tarefas</span></Link>
