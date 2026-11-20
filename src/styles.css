@@ -1150,3 +1150,140 @@ body:has(.rosa-home-dark) .rosa-settings-panel button { color: #eee7ff; }
 @media (prefers-reduced-motion: reduce) {
   .rosa-home-dark .rosa-note-glass { transition: none; }
 }
+
+
+/* Rosa Azul — crystal mirror finish for the dark workspace */
+.rosa-home-dark {
+  isolation: isolate;
+}
+.rosa-home-dark::after {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  inset: 4.5rem 0 0 5.25rem;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 0% 0%, oklch(0.88 0.12 295 / 12%), transparent 30%),
+    radial-gradient(ellipse at 100% 0%, oklch(0.82 0.11 245 / 10%), transparent 28%),
+    radial-gradient(ellipse at 100% 100%, oklch(0.78 0.13 285 / 9%), transparent 34%);
+}
+.rosa-home-dark .rosa-home-hero,
+.rosa-home-dark .rosa-agenda-panel,
+.rosa-home-dark .rosa-summary-tile {
+  border-color: oklch(0.96 0.035 285 / 24%);
+  box-shadow:
+    0 1px 0 oklch(1 0 0 / 24%) inset,
+    0 0 0 1px oklch(0.82 0.12 285 / 7%),
+    0 24px 65px -38px oklch(0.72 0.17 292 / 46%);
+}
+.rosa-home-dark .rosa-home-hero {
+  background:
+    linear-gradient(118deg, oklch(1 0 0 / 15%) 0%, transparent 28%, oklch(0.72 0.15 290 / 8%) 58%, oklch(1 0 0 / 7%) 100%),
+    radial-gradient(ellipse at 12% 0%, oklch(0.72 0.16 300 / 24%), transparent 52%),
+    linear-gradient(145deg, oklch(0.29 0.065 292 / 82%), oklch(0.17 0.045 275 / 86%));
+}
+.rosa-home-dark .rosa-note-glass {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid oklch(0.98 0.025 285 / 31%);
+  background:
+    linear-gradient(132deg, oklch(1 0 0 / 19%) 0%, oklch(0.86 0.055 285 / 9%) 22%, transparent 48%, oklch(0.72 0.13 285 / 12%) 100%),
+    radial-gradient(ellipse at 85% 8%, oklch(0.82 0.13 295 / 23%), transparent 48%),
+    linear-gradient(145deg, oklch(0.39 0.055 286 / 88%), oklch(0.23 0.045 275 / 91%));
+  box-shadow:
+    0 1px 0 oklch(1 0 0 / 28%) inset,
+    0 -1px 0 oklch(0.78 0.1 285 / 14%) inset,
+    0 18px 48px -27px oklch(0.72 0.18 295 / 62%),
+    0 4px 16px oklch(0.08 0.03 285 / 28%);
+  backdrop-filter: blur(28px) saturate(1.55);
+  -webkit-backdrop-filter: blur(28px) saturate(1.55);
+  transition: transform .35s cubic-bezier(.2,.8,.2,1), border-color .35s ease, box-shadow .35s ease, filter .35s ease;
+}
+.rosa-home-dark .rosa-note-glass::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: -45% 35% 35% -35%;
+  pointer-events: none;
+  transform: rotate(-18deg);
+  background: linear-gradient(180deg, oklch(1 0 0 / 23%), oklch(1 0 0 / 4%) 42%, transparent 76%);
+  filter: blur(1px);
+  opacity: .72;
+}
+.rosa-home-dark .rosa-note-glass::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: 1px;
+  pointer-events: none;
+  border: 1px solid oklch(1 0 0 / 13%);
+  border-radius: inherit;
+  background:
+    linear-gradient(145deg, oklch(1 0 0 / 10%), transparent 24%, transparent 72%, oklch(0.82 0.12 290 / 9%));
+  box-shadow: 0 1px 0 oklch(1 0 0 / 16%) inset;
+}
+.rosa-home-dark .rosa-note-glass > * {
+  position: relative;
+}
+.rosa-home-dark .rosa-note-glass .rosa-card-cover,
+.rosa-home-dark .rosa-note-glass .rosa-card-overlay {
+  position: absolute;
+}
+.rosa-home-dark .rosa-note-glass .rosa-card-overlay {
+  z-index: 1;
+  background: linear-gradient(180deg, oklch(0.2 0.035 285 / 8%), oklch(0.19 0.035 285 / 32%) 55%, oklch(0.15 0.035 285 / 78%));
+}
+.rosa-home-dark .rosa-note-glass .rosa-card-title,
+.rosa-home-dark .rosa-note-glass .rosa-card-description,
+.rosa-home-dark .rosa-note-glass .rosa-card-meta,
+.rosa-home-dark .rosa-note-glass .rosa-card-emoji,
+.rosa-home-dark .rosa-note-glass > span:not(.rosa-card-overlay):not(.rosa-card-cover) {
+  z-index: 3;
+}
+.rosa-home-dark .rosa-note-glass .rosa-card-title {
+  color: oklch(0.99 0.012 285);
+  text-shadow: 0 2px 18px oklch(0.08 0.03 285 / 55%);
+}
+.rosa-home-dark .rosa-note-glass .rosa-card-description,
+.rosa-home-dark .rosa-note-glass .rosa-card-meta {
+  color: oklch(0.86 0.035 285);
+}
+.rosa-home-dark .rosa-note-glass .rosa-card-emoji {
+  border-color: oklch(1 0 0 / 32%);
+  background: linear-gradient(145deg, oklch(1 0 0 / 25%), oklch(0.82 0.1 290 / 16%));
+  box-shadow: 0 1px 0 oklch(1 0 0 / 30%) inset, 0 8px 22px oklch(0.08 0.03 285 / 25%);
+}
+.rosa-home-dark .rosa-note-glass:hover {
+  transform: translateY(-5px) scale(1.012);
+  border-color: oklch(0.97 0.045 285 / 52%);
+  box-shadow:
+    0 1px 0 oklch(1 0 0 / 35%) inset,
+    0 0 0 1px oklch(0.82 0.13 295 / 18%),
+    0 26px 58px -28px oklch(0.72 0.18 295 / 78%),
+    0 0 32px oklch(0.7 0.16 285 / 15%);
+  filter: brightness(1.08);
+}
+.rosa-home-dark .rosa-create-card {
+  border-color: oklch(0.91 0.08 292 / 42%);
+  background:
+    linear-gradient(135deg, oklch(1 0 0 / 12%), transparent 46%),
+    linear-gradient(145deg, oklch(0.36 0.09 292 / 58%), oklch(0.19 0.05 280 / 70%));
+  box-shadow: 0 1px 0 oklch(1 0 0 / 20%) inset, 0 18px 44px -30px oklch(0.72 0.18 295 / 48%);
+}
+.rosa-home-dark .rosa-agenda-calendar,
+.rosa-home-dark .rosa-agenda-day,
+.rosa-home-dark .rosa-agenda-upcoming {
+  border: 1px solid oklch(1 0 0 / 13%);
+  background:
+    linear-gradient(135deg, oklch(1 0 0 / 8%), transparent 52%),
+    oklch(0.22 0.045 285 / 65%);
+  box-shadow: 0 1px 0 oklch(1 0 0 / 12%) inset, 0 14px 34px -28px oklch(0.72 0.17 295 / 48%);
+}
+@media (max-width: 640px) {
+  .rosa-home-dark::after { inset: 4rem 0 4.4rem; }
+  .rosa-home-dark .rosa-note-glass { backdrop-filter: blur(22px) saturate(1.4); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rosa-home-dark .rosa-note-glass { transition: none; }
+}
