@@ -19,7 +19,7 @@ export interface ChatMessage {
   content: string;
 }
 
-export interface Note {
+export interface VisualElement {\n  id: string;\n  type: "text" | "image" | "video";\n  x: number;\n  y: number;\n  width: number;\n  height: number;\n  content: string;\n}\n\nexport interface Note {
   id: string;
   title: string;
   description: string;
@@ -28,7 +28,7 @@ export interface Note {
   status?: TaskStatus;
   emoji?: string;
   coverImage?: string;
-  style?: NoteStyle;
+  style?: NoteStyle;\n  layoutElements?: VisualElement[];
   links: NoteLink[];
   chat: ChatMessage[];
   position: { x: number; y: number };
