@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Download, Plus, Search, Upload } from "lucide-react";
+import { BookOpen, Download, Plus, Search, Upload, Waypoints } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 
 import { NewNoteDialog } from "@/components/new-note-dialog";
@@ -108,7 +108,25 @@ function Index() {
         </div>
       </section>
 
-      <section className="rosa-note-grid mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+      <section className="rosa-workspace-summary mt-7 grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <div className="rosa-summary-tile">
+          <span className="rosa-summary-icon"><BookOpen className="h-4 w-4" /></span>
+          <span className="rosa-summary-copy"><strong>{notes.length}</strong><small>{notes.length === 1 ? "bloco criado" : "blocos criados"}</small></span>
+        </div>
+        <div className="rosa-summary-tile">
+          <span className="rosa-summary-icon"><Waypoints className="h-4 w-4" /></span>
+          <span className="rosa-summary-copy"><strong>{connections.length}</strong><small>{connections.length === 1 ? "conexão no mural" : "conexões no mural"}</small></span>
+        </div>
+        <div className="rosa-summary-tile col-span-2 sm:col-span-1">
+          <span className="rosa-summary-copy"><strong>{hydrated ? "Seu espaço está pronto" : "Preparando seu espaço"}</strong><small>Ideias, referências e projetos em um só lugar</small></span>
+        </div>
+      </section>
+
+      <div className="rosa-section-heading mt-9">
+        <div><p className="rosa-section-eyebrow">SUA BIBLIOTECA</p><h2>Seus blocos de ideias</h2></div>
+        <span>{query ? `${filtered.length} resultado(s)` : "Atualizados recentemente"}</span>
+      </div>
+      <section className="rosa-note-grid mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {!hydrated &&
           Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className="aspect-square rounded-2xl bg-secondary" />
@@ -122,13 +140,14 @@ function Index() {
             trigger={
               <button
                 type="button"
-                className="rosa-create-card aspect-square flex animate-fade-up flex-col items-center justify-center gap-3 rounded-[1.4rem] border-2 border-dashed border-border text-muted-foreground transition-colors hover:border-primary hover:bg-paper hover:text-primary"
+                className="rosa-create-card aspect-square flex animate-fade-up flex-col items-center justify-center gap-3 rounded-[1.4rem] border border-dashed border-primary/30 text-muted-foreground transition-colors hover:border-primary hover:bg-paper hover:text-primary"
                 style={{ animationDelay: `${Math.min(filtered.length, 12) * 45}ms` }}
               >
-                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary">
+                <span className="flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/15 bg-paper/70 shadow-paper">
                   <Plus className="h-6 w-6" />
                 </span>
                 <span className="font-display text-lg">Criar novo bloco</span>
+                <span className="max-w-[13rem] text-center text-xs text-muted-foreground">Abra uma nova página para guardar uma ideia.</span>
               </button>
             }
           />
