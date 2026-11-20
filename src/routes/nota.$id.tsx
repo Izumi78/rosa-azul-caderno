@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Bold, Check, Code2, Eye, FileImage, Heading2, Italic, Link2, List, PenLine, Quote, Sparkles, Trash2, Waypoints } from "lucide-react";
+import { ArrowLeft, Bold, Check, Code2, Eye, FileImage, Heading2, ImagePlus, Italic, Link2, List, PenLine, Quote, Sparkles, Trash2, Waypoints } from "lucide-react";
 import { useLayoutEffect, useMemo, useRef, useState, type ClipboardEvent } from "react";
 
 import { AiAssistant } from "@/components/ai-assistant";
@@ -75,6 +75,7 @@ function NoteEditor({ note }: { note: Note }) {
   const [mode, setMode] = useState<"write" | "view">("write");
   const textRef = useRef<HTMLTextAreaElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const coverUploadRef = useRef<HTMLInputElement>(null);
   const related = useMemo(() => connectedNotes(state, note.id), [state, note.id]);
 
   useLayoutEffect(() => {
@@ -176,7 +177,17 @@ function NoteEditor({ note }: { note: Note }) {
             aria-label="Título do bloco"
             className="block h-16 w-full bg-transparent font-display text-3xl font-semibold leading-[4rem] text-foreground outline-none placeholder:text-muted-foreground/60 sm:text-4xl"
           />
-          <input
+                    <div className="rosa-note-customize relative z-10 my-3 flex flex-wrap items-center gap-2 rounded-xl border border-primary/10 bg-background/35 p-2.5 backdrop-blur-md">
+            <label className="flex items-center gap-2 text-xs text-muted-foreground">
+              Emoji
+              <input value={note.emoji || "🌷"} onChange={(e) => notesActions.update(note.id, { emoji: e.target.value })} maxLength={8} aria-label="Emoji do bloco" className="h-9 w-14 rounded-lg border border-border bg-paper/70 text-center text-lg outline-none focus:ring-2 focus:ring-ring" />
+            </label>
+            <input value={note.coverImage?.startsWith("data:") ? "Imagem carregada ✓" : note.coverImage || ""} onChange={(e) => notesActions.update(note.id, { coverImage: e.target.value })} disabled={note.coverImage?.startsWith("data:")} placeholder="URL da foto de capa" aria-label="URL da foto de capa" className="h-9 min-w-[140px] flex-1 rounded-lg border border-border bg-paper/70 px-3 text-xs outline-none focus:ring-2 focus:ring-ring" />
+            <Button type="button" variant="outline" size="sm" className="h-9 bg-paper/60" onClick={() => coverUploadRef.current?.click()}><ImagePlus className="h-4 w-4" />Foto</Button>
+            <input ref={coverUploadRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (!file) return; if (file.size > 300 * 1024) { window.alert("A foto de capa deve ter até 300 KB."); e.currentTarget.value = ""; return; } const reader = new FileReader(); reader.onload = () => notesActions.update(note.id, { coverImage: String(reader.result || "") }); reader.readAsDataURL(file); e.currentTarget.value = ""; }} />
+            {note.coverImage && <Button type="button" variant="ghost" size="sm" className="h-9 text-muted-foreground" onClick={() => notesActions.update(note.id, { coverImage: "" })}>Remover foto</Button>}
+          </div>
+<input
             value={note.description}
             onChange={(e) => notesActions.update(note.id, { description: e.target.value })}
             placeholder="Descrição curta do bloco"
