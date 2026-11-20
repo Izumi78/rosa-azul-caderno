@@ -90,6 +90,9 @@ export function useNote(id: string): { hydrated: boolean; note: Note | undefined
 }
 
 export const notesActions = {
+  restoreBackup(data: NotesData) {
+    set({ notes: data.notes, connections: data.connections });
+  },
   create(input: { title: string; description: string; color?: NoteColor }): Note {
     const { data, note } = addNote(state, input);
     set(data);
