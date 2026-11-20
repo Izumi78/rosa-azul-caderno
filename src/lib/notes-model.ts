@@ -4,6 +4,7 @@ export type NoteColor = "roxo" | "azul" | "tinta";
 
 export type NoteFont = "serif" | "sans" | "mono";
 export type NotePaper = "cream" | "lavender" | "blue" | "dark";
+export type TaskStatus = "fazer" | "fazendo" | "feito";
 export interface NoteStyle { font: NoteFont; size: number; paper: NotePaper; }
 
 export interface NoteLink {
@@ -24,6 +25,7 @@ export interface Note {
   description: string;
   content: string;
   color: NoteColor;
+  status?: TaskStatus;
   emoji?: string;
   coverImage?: string;
   style?: NoteStyle;
@@ -77,6 +79,7 @@ export function addNote(
     description: input.description.trim(),
     content: "",
     color: input.color ?? "roxo",
+    status: "fazer",
     emoji: input.emoji || "🌷",
     coverImage: input.coverImage || "",
     links: [],
