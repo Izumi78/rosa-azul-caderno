@@ -25,8 +25,8 @@ export const Route = createFileRoute("/mural")({
   component: MuralPage,
 });
 
-const CARD_W = 220;
-const CARD_H = 124;
+const CARD_W = 168;
+const CARD_H = 96;
 
 const STROKE: Record<NoteColor, string> = {
   roxo: "var(--note-roxo)",
@@ -53,6 +53,9 @@ function MuralPage() {
   const { notes, connections, hydrated } = useNotesState();
   const navigate = useNavigate();
   const canvasRef = useRef<HTMLDivElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const [camera, setCamera] = useState({ x: 0, y: 0, scale: 1 });
+  const pan = useRef<{ x: number; y: number; originX: number; originY: number } | null>(null);
   const [linking, setLinking] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   const [cursor, setCursor] = useState<{ x: number; y: number } | null>(null);
@@ -60,8 +63,21 @@ function MuralPage() {
   const drag = useRef<{ id: string; dx: number; dy: number; sx: number; sy: number; moved: boolean } | null>(null);
 
   const byId = useMemo(() => new Map(notes.map((n) => [n.id, n])), [notes]);
-  const width = Math.max(1600, ...notes.map((n) => n.position.x + CARD_W + 300));
-  const height = Math.max(1000, ...notes.map((n) => n.position.y + CARD_H + 300));
+  const width = Math.max(5000, ...notes.map((n) => n.position.x + CARD_W + 1200));
+  const height = Math.max(3600, ...notes.map((n) => n.position.y + CARD_H + 1000));
+
+  useEffect(() => {
+    if (!hydrated || !viewportRef.current) return;
+    const bounds = notes.reduce((acc, note) => ({
+      minX: Math.min(acc.minX, note.position.x),
+      minY: Math.min(acc.minY, note.position.y),
+      maxX: Math.max(acc.maxX, note.position.x + CARD_W),
+      maxY: Math.max(acc.maxY, note.position.y + CARD_H),
+    }), { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity });
+    const centerX = notes.length ? (bounds.minX + bounds.maxX) / 2 : width / 2;
+    const centerY = notes.length ? (bounds.minY + bounds.maxY) / 2 : height / 2;
+    setCamera({ x: viewportRef.current.clientWidth / 2 - centerX, y: viewportRef.current.clientHeight / 2 - centerY, scale: 1 });
+  }, [hydrated, notes.length]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -76,7 +92,33 @@ function MuralPage() {
 
   function canvasPoint(e: { clientX: number; clientY: number }) {
     const rect = canvasRef.current?.getBoundingClientRect();
-    return { x: e.clientX - (rect?.left ?? 0), y: e.clientY - (rect?.top ?? 0) };
+    return { x: (e.clientX - (rect?.left ?? 0)) / camera.scale, y: (e.clientY - (rect?.top ?? 0)) / camera.scale };
+  }
+
+  function onViewportPointerDown(e: ReactPointerEvent<HTMLDivElement>) {
+    if (e.button !== 0 || (e.target as HTMLElement).closest(".rosa-mural-card, button, a")) return;
+    pan.current = { x: e.clientX, y: e.clientY, originX: camera.x, originY: camera.y };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  }
+
+  function onViewportPointerMove(e: ReactPointerEvent<HTMLDivElement>) {
+    if (!pan.current) return;
+    setCamera((current) => ({ ...current, x: pan.current!.originX + e.clientX - pan.current!.x, y: pan.current!.originY + e.clientY - pan.current!.y }));
+  }
+
+  function onViewportPointerUp() { pan.current = null; }
+
+  function onCanvasWheel(e: React.WheelEvent<HTMLDivElement>) {
+    e.preventDefault();
+    const rect = viewportRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const px = e.clientX - rect.left;
+    const py = e.clientY - rect.top;
+    setCamera((current) => {
+      const scale = Math.min(1.8, Math.max(0.45, current.scale * (e.deltaY < 0 ? 1.08 : 0.92)));
+      const ratio = scale / current.scale;
+      return { scale, x: px - (px - current.x) * ratio, y: py - (py - current.y) * ratio };
+    });
   }
 
   function onCardPointerDown(e: ReactPointerEvent<HTMLDivElement>, id: string) {
@@ -132,7 +174,7 @@ function MuralPage() {
               ? selected
                 ? "Agora clique no bloco que tem a ver com este."
                 : "Clique em um bloco e depois em outro para ligá-los."
-              : "Arraste os blocos para organizar. Clique em um bloco para abri-lo."}
+              : "Arraste o fundo para explorar o espaço, use a roda do mouse para aproximar ou afastar e arraste os blocos para organizá-los."}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -151,7 +193,7 @@ function MuralPage() {
         </div>
       </div>
 
-      <div className="rosa-mural-canvas rosa-mural-stage relative min-h-0 flex-1 overflow-auto">
+      <div ref={viewportRef} className="rosa-mural-canvas rosa-mural-stage relative min-h-0 flex-1 overflow-hidden cursor-grab active:cursor-grabbing" onPointerDown={onViewportPointerDown} onPointerMove={(e) => { onViewportPointerMove(e); if (linking && selected) setCursor(canvasPoint(e)); }} onPointerUp={onViewportPointerUp} onPointerCancel={onViewportPointerUp} onWheel={onCanvasWheel}>
         {!hydrated ? (
           <div className="p-10">
             <Skeleton className="h-32 w-56 bg-secondary" />
@@ -160,8 +202,7 @@ function MuralPage() {
           <div
             ref={canvasRef}
             className="relative"
-            style={{ width, height }}
-            onPointerMove={(e) => linking && selected && setCursor(canvasPoint(e))}
+            style={{ width, height, transform: `translate(${camera.x}px, ${camera.y}px) scale(${camera.scale})`, transformOrigin: "0 0" }}
             onPointerLeave={() => setCursor(null)}
           >
             <svg className="rosa-synapse-svg pointer-events-none absolute inset-0" width={width} height={height}>
@@ -229,7 +270,7 @@ function MuralPage() {
                   onPointerUp={() => onCardPointerUp(n.id)}
                   onKeyDown={(e) => e.key === "Enter" && onCardPointerUp(n.id)}
                   className={cn(
-                    "rosa-mural-card group absolute flex touch-none select-none flex-col overflow-hidden rounded-[1.35rem] border p-4 pl-5 backdrop-blur-xl transition-all duration-300 animate-fade-up",
+                    "rosa-mural-card group absolute flex touch-none select-none flex-col overflow-hidden rounded-2xl border p-3 pl-4 backdrop-blur-xl transition-all duration-300 animate-fade-up",
                     linking ? "cursor-crosshair" : "cursor-grab active:cursor-grabbing",
                     isSel && "ring-2 ring-primary ring-offset-2 ring-offset-background",
                   )}
@@ -242,8 +283,8 @@ function MuralPage() {
                   }}
                 >
                   <span className={cn("absolute inset-y-0 left-0 w-1.5", NOTE_COLOR_BG[n.color])} />
-                  {n.coverImage && <img src={n.coverImage} alt="" className="absolute inset-0 h-full w-full object-cover opacity-25" />}\n                  <span className="rosa-mural-card-gloss absolute inset-0" />\n                  <span className="relative z-10 mb-1 text-xl">{n.emoji || "🌷"}</span>\n                  <p className="relative z-10 line-clamp-2 font-display text-lg font-semibold leading-snug text-foreground">{n.title}</p>
-                  <p className="relative z-10 mt-1 line-clamp-2 text-xs text-muted-foreground">{n.description || "Sem descrição"}</p>
+                  {n.coverImage && <img src={n.coverImage} alt="" className="absolute inset-0 h-full w-full object-cover opacity-25" />}\n                  <span className="rosa-mural-card-gloss absolute inset-0" />\n                  <span className="relative z-10 mb-0.5 text-base">{n.emoji || "🌷"}</span>\n                  <p className="relative z-10 line-clamp-2 font-display text-sm font-semibold leading-snug text-foreground">{n.title}</p>
+                  <p className="relative z-10 mt-0.5 line-clamp-2 text-[10px] leading-snug text-muted-foreground">{n.description || "Sem descrição"}</p>
                 </div>
               );
             })}
