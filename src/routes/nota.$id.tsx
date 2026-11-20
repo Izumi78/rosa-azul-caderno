@@ -24,6 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { connectedNotes, type Note } from "@/lib/notes-model";
 import { notesActions, useNotesState } from "@/lib/notes-store";
+import { compressImageForNotes } from "@/lib/image-utils";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/nota/$id")({
@@ -156,26 +157,36 @@ function NoteEditor({ note }: { note: Note }) {
     saveContent(value.slice(0, lineStart) + prefix + value.slice(lineStart));
     requestAnimationFrame(() => { if (el) { el.focus(); el.setSelectionRange(start + prefix.length, start + prefix.length); } });
   };
-  const addFileAttachment = (file: File) => {
-    if (file.size > 1024 * 1024) { window.alert("Arquivo maior que 1 MB. Para manter o caderno leve, anexe um arquivo menor ou use um link de vídeo."); return; }
+  const addFileAttachment = async (file: File) => {
+    const name = file.name.replace(/[\\[\\]()]/g, "_");
+    if (file.type.startsWith("image/")) {
+      try {
+        const data = await compressImageForNotes(file);
+        saveContent(note.content + (note.content.endsWith("\n") ? "" : "\n\n") + "![" + name + "](" + data + ")\n");
+      } catch (error) {
+        window.alert(error instanceof Error ? error.message : "Não foi possível anexar a imagem.");
+      }
+      return;
+    }
+    if (file.size > 1024 * 1024) { window.alert("Arquivo maior que 1 MB. Para manter o caderno leve, anexe um arquivo menor ou use um link."); return; }
     const reader = new FileReader();
-    reader.onload = () => { const data = String(reader.result || ""), name = file.name.replace(/[\[\]()]/g, "_");
+    reader.onload = () => {
+      const data = String(reader.result || "");
       saveContent(note.content + (note.content.endsWith("\n") ? "" : "\n\n") + "[" + name + "](" + data + ")\n");
     };
     reader.readAsDataURL(file);
   };
-  const handlePaste = (event: ClipboardEvent<HTMLTextAreaElement>) => {
+  const handlePaste = async (event: ClipboardEvent<HTMLTextAreaElement>) => {
     const file = Array.from(event.clipboardData.items).find((item) => item.type.startsWith("image/"))?.getAsFile();
-    if (!file) return; event.preventDefault();
-    const reader = new FileReader();
-    reader.onload = () => { const img = new Image(); img.onload = () => {
-      const scale = Math.min(1, 1200 / Math.max(img.width, img.height)), canvas = document.createElement("canvas");
-      canvas.width = Math.max(1, Math.round(img.width * scale)); canvas.height = Math.max(1, Math.round(img.height * scale));
-      const ctx = canvas.getContext("2d"); if (!ctx) return; ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      const data = canvas.toDataURL("image/jpeg", 0.72), el = textRef.current, value = note.content, start = el?.selectionStart ?? value.length, end = el?.selectionEnd ?? value.length;
+    if (!file) return;
+    event.preventDefault();
+    try {
+      const data = await compressImageForNotes(file);
+      const el = textRef.current, value = note.content, start = el?.selectionStart ?? value.length, end = el?.selectionEnd ?? value.length;
       saveContent(value.slice(0, start) + "\n![Imagem colada](" + data + ")\n" + value.slice(end));
-    }; img.src = String(reader.result); };
-    reader.readAsDataURL(file);
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : "Não foi possível colar esta imagem.");
+    }
   };
 
   return (
@@ -268,7 +279,7 @@ function NoteEditor({ note }: { note: Note }) {
             </label>
             <input value={note.coverImage?.startsWith("data:") ? "Imagem carregada ✓" : note.coverImage || ""} onChange={(e) => notesActions.update(note.id, { coverImage: e.target.value })} disabled={note.coverImage?.startsWith("data:")} placeholder="URL da foto de capa" aria-label="URL da foto de capa" className="h-9 min-w-[140px] flex-1 rounded-lg border border-border bg-paper/70 px-3 text-xs outline-none focus:ring-2 focus:ring-ring" />
             <Button type="button" variant="outline" size="sm" className="h-9 bg-paper/60" onClick={() => coverUploadRef.current?.click()}><ImagePlus className="h-4 w-4" />Foto</Button>
-            <input ref={coverUploadRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (!file) return; if (file.size > 300 * 1024) { window.alert("A foto de capa deve ter até 300 KB."); e.currentTarget.value = ""; return; } const reader = new FileReader(); reader.onload = () => notesActions.update(note.id, { coverImage: String(reader.result || "") }); reader.readAsDataURL(file); e.currentTarget.value = ""; }} />
+            <input ref={coverUploadRef} type="file" accept="image/*" className="hidden" onChange={async (e) => { const file = e.target.files?.[0]; e.currentTarget.value = ""; if (!file) return; try { notesActions.update(note.id, { coverImage: await compressImageForNotes(file) }); } catch (error) { window.alert(error instanceof Error ? error.message : "Não foi possível carregar a foto."); } }} />
             {note.coverImage && <Button type="button" variant="ghost" size="sm" className="h-9 text-muted-foreground" onClick={() => notesActions.update(note.id, { coverImage: "" })}>Remover foto</Button>}
           </div>
 <input
