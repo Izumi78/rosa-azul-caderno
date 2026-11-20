@@ -1,12 +1,32 @@
 import { Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Link2, Waypoints } from "lucide-react";
 
 import type { Note } from "@/lib/notes-model";
+import { getMediaFile, getMediaId } from "@/lib/image-utils";
 import { cn } from "@/lib/utils";
 
 import { NOTE_COLOR_BG, NOTE_COLOR_TEXT } from "./note-colors";
+
+function NoteCover({ reference }: { reference: string }) {
+  const [src, setSrc] = useState(reference.startsWith("data:image/") ? reference : "");
+  useEffect(() => {
+    let active = true;
+    let objectUrl = "";
+    const id = getMediaId(reference);
+    if (!id) { setSrc(reference.startsWith("data:image/") ? reference : reference); return; }
+    getMediaFile(id).then((file) => {
+      if (!active || !file) return;
+      objectUrl = URL.createObjectURL(file.blob);
+      setSrc(objectUrl);
+    }).catch(() => { if (active) setSrc(""); });
+    return () => { active = false; if (objectUrl) URL.revokeObjectURL(objectUrl); };
+  }, [reference]);
+  if (!src) return null;
+  return <img src={src} alt="" className="rosa-card-cover absolute inset-0 h-full w-full object-cover" />;
+}
 
 export function NoteCard({ note, links, index }: { note: Note; links: number; index: number }) {
   return (
@@ -23,7 +43,7 @@ export function NoteCard({ note, links, index }: { note: Note; links: number; in
         )}
       >
         <span className={cn("absolute inset-y-0 left-0 w-2", NOTE_COLOR_BG[note.color])} />
-        {note.coverImage && <img src={note.coverImage} alt="" className="rosa-card-cover absolute inset-0 h-full w-full object-cover" />}
+        {note.coverImage && <NoteCover reference={note.coverImage} />}
         <span className="rosa-card-overlay absolute inset-0" />
         <span className="rosa-card-emoji absolute right-3 top-3 z-10 flex h-12 w-12 items-center justify-center rounded-2xl border border-white/35 bg-white/25 text-2xl shadow-sm backdrop-blur-lg" aria-hidden="true">{note.emoji || "🌷"}</span>
         <span className="absolute left-3 top-4 z-10 flex flex-col gap-3" aria-hidden="true">
