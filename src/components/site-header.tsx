@@ -23,6 +23,7 @@ export function SiteHeader() {
   return (
     <>
       <header className="rosa-topbar sticky top-0 z-40 flex h-[4.5rem] items-center justify-center border-b border-border/70 px-4">
+        <div className="absolute left-4 top-1/2 -translate-y-1/2 sm:left-5"><ProfileAvatar /></div>
         <Link to="/" aria-label="Rosa Azul — início" className="rosa-topbar-brand flex items-center justify-center">
           <Wordmark />
         </Link>
@@ -35,7 +36,6 @@ export function SiteHeader() {
         <div className="my-2 h-px w-8 bg-border" />
         <div className="flex-1" />
         <button type="button" className={itemClass} onClick={() => setSettingsOpen((v) => !v)} aria-expanded={settingsOpen}><Settings2 className="h-5 w-5" />Ajustes</button>
-        <ProfileAvatar />
       </aside>
       {settingsOpen && <div className="rosa-settings-panel fixed bottom-24 left-[5.75rem] z-50 w-64 rounded-2xl border border-border p-4 shadow-2xl">
         <div className="mb-3"><p className="text-sm font-semibold text-foreground">Preferências</p><p className="text-xs text-muted-foreground">Personalize seu espaço de escrita.</p></div>
