@@ -1,4 +1,4 @@
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown, { defaultUrlTransform } from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 
@@ -26,7 +26,7 @@ export function MarkdownView({ source, className }: { source: string; className?
     >
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkBreaks]}
-        components={{
+        urlTransform={(url, key) => {\n          const safeData = /^data:(image\\/(?:jpeg|png|gif|webp)|application\\/pdf|text\\/plain);base64,[A-Za-z0-9+/=]+$/.test(url);\n          if (safeData && (key === "src" || key === "href")) return url;\n          return defaultUrlTransform(url, key);\n        }}\n        components={{
           a: ({ children, href }) => (
             <a href={href} target="_blank" rel="noreferrer noopener">
               {children}
