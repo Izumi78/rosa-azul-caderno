@@ -1287,3 +1287,55 @@ body:has(.rosa-home-dark) .rosa-settings-panel button { color: #eee7ff; }
 @media (prefers-reduced-motion: reduce) {
   .rosa-home-dark .rosa-note-glass { transition: none; }
 }
+
+
+/* Signature rose, profile identity and dedicated calendar surface */
+.rosa-rail-link.is-active {
+  color: oklch(0.94 0.075 295);
+  background: linear-gradient(145deg, oklch(0.68 0.15 292 / 22%), oklch(0.55 0.13 270 / 12%));
+  box-shadow: 0 1px 0 oklch(1 0 0 / 14%) inset, 0 8px 24px -16px oklch(0.7 0.18 295 / 65%);
+}
+.rosa-profile {
+  width: 100%;
+  border: 1px solid oklch(0.94 0.04 290 / 17%);
+  background: linear-gradient(145deg, oklch(1 0 0 / 9%), oklch(0.68 0.12 290 / 9%));
+  box-shadow: 0 1px 0 oklch(1 0 0 / 13%) inset, 0 8px 22px -18px oklch(0.7 0.16 295 / 55%);
+}
+.rosa-profile-fallback {
+  color: oklch(0.98 0.02 290);
+  border: 1px solid oklch(1 0 0 / 35%);
+  background: linear-gradient(145deg, oklch(0.75 0.14 295), oklch(0.43 0.13 275));
+  box-shadow: 0 1px 0 oklch(1 0 0 / 35%) inset, 0 0 18px oklch(0.7 0.16 295 / 25%);
+}
+.rosa-calendar-page {
+  position: relative;
+  isolation: isolate;
+}
+.rosa-calendar-page::before {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  inset: 4.5rem 0 0 5.25rem;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 12% 8%, oklch(0.62 0.16 295 / 20%), transparent 36%),
+    radial-gradient(ellipse at 90% 82%, oklch(0.55 0.15 260 / 15%), transparent 38%);
+}
+.rosa-calendar-page .rosa-agenda-panel {
+  margin-top: 0;
+  border-color: oklch(0.94 0.04 290 / 23%);
+  background: linear-gradient(145deg, oklch(0.29 0.06 290 / 86%), oklch(0.16 0.045 275 / 92%));
+  box-shadow: 0 1px 0 oklch(1 0 0 / 17%) inset, 0 28px 70px -40px oklch(0.67 0.17 292 / 45%);
+  backdrop-filter: blur(26px) saturate(1.4);
+}
+.rosa-calendar-page .rosa-agenda-calendar,
+.rosa-calendar-page .rosa-agenda-day,
+.rosa-calendar-page .rosa-agenda-upcoming {
+  background: linear-gradient(135deg, oklch(1 0 0 / 9%), transparent 55%), oklch(0.2 0.045 285 / 72%);
+  border-color: oklch(1 0 0 / 15%);
+}
+@media (max-width: 640px) {
+  .rosa-profile { justify-content: center; padding-inline: 0; }
+  .rosa-profile > span:last-child { display: none; }
+  .rosa-calendar-page::before { inset: 4.5rem 0 4.5rem; }
+}
