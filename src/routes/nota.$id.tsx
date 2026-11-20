@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Check, Eye, Link2, PenLine, Sparkles, Trash2, Waypoints } from "lucide-react";
+import { ArrowLeft, Bold, Check, Code2, Eye, FileImage, Heading2, Italic, Link2, List, Paperclip, PenLine, Quote, Sparkles, Trash2, Waypoints } from "lucide-react";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { AiAssistant } from "@/components/ai-assistant";
@@ -74,6 +74,7 @@ function NoteEditor({ note }: { note: Note }) {
   const navigate = useNavigate();
   const [mode, setMode] = useState<"write" | "view">("write");
   const textRef = useRef<HTMLTextAreaElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
   const related = useMemo(() => connectedNotes(state, note.id), [state, note.id]);
 
   useLayoutEffect(() => {
@@ -84,6 +85,38 @@ function NoteEditor({ note }: { note: Note }) {
   }, [note.content, mode]);
 
   const words = note.content.trim() ? note.content.trim().split(/\s+/).length : 0;
+  const insertAtCursor = (before: string, after = before, placeholder = "texto") => {
+    const el = textRef.current, value = note.content, start = el?.selectionStart ?? value.length, end = el?.selectionEnd ?? value.length;
+    const selected = value.slice(start, end) || placeholder;
+    notesActions.update(note.id, { content: value.slice(0, start) + before + selected + after + value.slice(end) });
+    requestAnimationFrame(() => { if (el) { el.focus(); el.setSelectionRange(start + before.length, start + before.length + selected.length); } });
+  };
+  const insertLinePrefix = (prefix: string) => {
+    const el = textRef.current, value = note.content, start = el?.selectionStart ?? value.length, lineStart = value.lastIndexOf("\n", Math.max(0, start - 1)) + 1;
+    notesActions.update(note.id, { content: value.slice(0, lineStart) + prefix + value.slice(lineStart) });
+    requestAnimationFrame(() => { if (el) { el.focus(); el.setSelectionRange(start + prefix.length, start + prefix.length); } });
+  };
+  const addFileAttachment = (file: File) => {
+    if (file.size > 400 * 1024) { window.alert("Arquivo maior que 400 KB. Anexe um arquivo menor para manter o caderno leve."); return; }
+    const reader = new FileReader();
+    reader.onload = () => { const data = String(reader.result || ""), name = file.name.replace(/[\[\]()]/g, "_");
+      notesActions.update(note.id, { content: note.content + (note.content.endsWith("\n") ? "" : "\n\n") + "[" + name + "](" + data + ")\n" });
+    };
+    reader.readAsDataURL(file);
+  };
+  const handlePaste = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const file = Array.from(event.clipboardData.items).find((item) => item.type.startsWith("image/"))?.getAsFile();
+    if (!file) return; event.preventDefault();
+    const reader = new FileReader();
+    reader.onload = () => { const img = new Image(); img.onload = () => {
+      const scale = Math.min(1, 1200 / Math.max(img.width, img.height)), canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(img.width * scale)); canvas.height = Math.max(1, Math.round(img.height * scale));
+      const ctx = canvas.getContext("2d"); if (!ctx) return; ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const data = canvas.toDataURL("image/jpeg", 0.72), el = textRef.current, value = note.content, start = el?.selectionStart ?? value.length, end = el?.selectionEnd ?? value.length;
+      notesActions.update(note.id, { content: value.slice(0, start) + "\n![Imagem colada](" + data + ")\n" + value.slice(end) });
+    }; img.src = String(reader.result); };
+    reader.readAsDataURL(file);
+  };
 
   return (
     <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[minmax(0,1fr)_400px]">
@@ -152,10 +185,22 @@ function NoteEditor({ note }: { note: Note }) {
           />
           <div className="mt-8">
             {mode === "write" ? (
-              <textarea
+              <div className="rosa-editor-tools mb-3 flex flex-wrap items-center gap-1 rounded-2xl border border-primary/10 bg-paper/70 p-2 shadow-sm backdrop-blur">
+<Button type="button" variant="ghost" size="icon" title="Negrito" aria-label="Negrito" onClick={() => insertAtCursor("**", "**")}><Bold className="h-4 w-4" /></Button>
+<Button type="button" variant="ghost" size="icon" title="Itálico" aria-label="Itálico" onClick={() => insertAtCursor("*", "*")}><Italic className="h-4 w-4" /></Button>
+<Button type="button" variant="ghost" size="icon" title="Título" aria-label="Título" onClick={() => insertLinePrefix("## ")}><Heading2 className="h-4 w-4" /></Button>
+<Button type="button" variant="ghost" size="icon" title="Lista" aria-label="Lista" onClick={() => insertLinePrefix("- ")}><List className="h-4 w-4" /></Button>
+<Button type="button" variant="ghost" size="icon" title="Citação" aria-label="Citação" onClick={() => insertLinePrefix("> ")}><Quote className="h-4 w-4" /></Button>
+<Button type="button" variant="ghost" size="icon" title="Código" aria-label="Código" onClick={() => insertAtCursor("`", "`")}><Code2 className="h-4 w-4" /></Button>
+<span className="mx-1 h-5 w-px bg-border" />
+<Button type="button" variant="ghost" size="sm" className="gap-1.5" title="Inserir imagem ou arquivo" onClick={() => fileRef.current?.click()}><FileImage className="h-4 w-4" />Imagem/Arquivo</Button>
+<input ref={fileRef} type="file" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) addFileAttachment(file); e.currentTarget.value = ""; }} />
+</div>
+<textarea
                 ref={textRef}
                 value={note.content}
-                onChange={(e) => notesActions.update(note.id, { content: e.target.value })}
+                onChange={(e) => notesActions.update(note.id, { content: e.target.value })
+                onPaste={handlePaste}
                 placeholder="Comece a escrever… (dica: use # para títulos, - para listas)"
                 aria-label="Conteúdo da página"
                 className="block min-h-[55vh] w-full resize-none overflow-hidden bg-transparent font-serif text-lg leading-8 text-foreground outline-none placeholder:text-muted-foreground/60"
