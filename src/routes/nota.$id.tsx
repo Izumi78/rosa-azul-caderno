@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, Bold, Check, Code2, Eye, FileImage, Heading2, ImagePlus, Italic, Link2, List, ListOrdered, PenLine, Quote, Sparkles, Strikethrough, Trash2, Waypoints, Undo2, Redo2, Table } from "lucide-react";
-import { useLayoutEffect, useMemo, useRef, useState, type ClipboardEvent } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ClipboardEvent } from "react";
 
 import { AiAssistant } from "@/components/ai-assistant";
 import { ColorPicker } from "@/components/color-picker";
@@ -102,6 +102,14 @@ function NoteEditor({ note }: { note: Note }) {
     notesActions.update(note.id, { content: next });
   };
   const related = useMemo(() => connectedNotes(state, note.id), [state, note.id]);
+
+  useEffect(() => {
+    if (historyCurrent.current !== note.content) {
+      historyCurrent.current = note.content;
+      undoStack.current = [];
+      redoStack.current = [];
+    }
+  }, [note.content]);
 
   useLayoutEffect(() => {
     const el = textRef.current;
