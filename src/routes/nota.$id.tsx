@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Bold, Check, Code2, Eye, FileImage, Heading2, ImagePlus, Italic, Link2, List, ListOrdered, PenLine, Quote, Sparkles, Strikethrough, Trash2, Waypoints, Undo2, Redo2, Table, SlidersHorizontal } from "lucide-react";
+import { ArrowLeft, Bold, Check, Code2, Eye, FileImage, Heading2, ImagePlus, Italic, Link2, List, ListOrdered, PenLine, Quote, Sparkles, Strikethrough, Trash2, Waypoints, Undo2, Redo2, Table, SlidersHorizontal, Search, FileText } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ClipboardEvent } from "react";
 
 import { AiAssistant } from "@/components/ai-assistant";
@@ -74,6 +74,7 @@ function NoteEditor({ note }: { note: Note }) {
   const navigate = useNavigate();
   const [mode, setMode] = useState<"write" | "view">("write");
   const [customizeOpen, setCustomizeOpen] = useState(false);
+  const [noteSearch, setNoteSearch] = useState("");
   const style = note.style || { font: "serif" as const, size: 18, paper: "cream" as const };
   const fontFamily = style.font === "sans" ? "Manrope, system-ui, sans-serif" : style.font === "mono" ? "ui-monospace, monospace" : "Literata, Georgia, serif";
   const paperColors = { cream: "var(--paper)", lavender: "oklch(0.96 0.035 300)", blue: "oklch(0.96 0.035 245)", dark: "oklch(0.24 0.02 285)" };
@@ -179,6 +180,24 @@ function NoteEditor({ note }: { note: Note }) {
 
   return (
     <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[minmax(0,1fr)_400px]">
+      <nav className="rosa-note-switcher lg:col-span-2" aria-label="Navegação rápida entre blocos">
+        <div className="flex flex-wrap items-center justify-between gap-3 px-3 pt-3">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[.16em] text-violet-200/75"><FileText className="h-4 w-4" /> Seus blocos</div>
+          <div className="relative w-full sm:w-56">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-violet-100/45" />
+            <input value={noteSearch} onChange={(e) => setNoteSearch(e.target.value)} placeholder="Localizar outra nota..." aria-label="Localizar outra nota" className="h-8 w-full rounded-lg border border-white/10 bg-black/15 pl-8 pr-3 text-xs text-white outline-none placeholder:text-violet-100/40 focus:border-violet-300/40" />
+          </div>
+        </div>
+        <div className="rosa-note-switcher-list flex gap-2 overflow-x-auto px-3 py-3">
+          {[...state.notes].filter((item) => item.title.toLowerCase().includes(noteSearch.trim().toLowerCase())).sort((a, b) => b.updatedAt - a.updatedAt).map((item) => (
+            <Link key={item.id} to="/nota/$id" params={{ id: item.id }} aria-current={item.id === note.id ? "page" : undefined}
+              className={cn("rosa-note-switcher-tab shrink-0 rounded-xl border px-3 py-2 text-left transition-all", item.id === note.id && "is-current")}>
+              <span className="mr-1.5">{item.emoji || "🌷"}</span><span className="max-w-36 truncate align-middle text-xs font-medium">{item.title || "Sem título"}</span>
+            </Link>
+          ))}
+          {state.notes.filter((item) => item.title.toLowerCase().includes(noteSearch.trim().toLowerCase())).length === 0 && <span className="px-2 py-2 text-xs text-violet-100/45">Nenhuma nota encontrada.</span>}
+        </div>
+      </nav>
       <div className="min-w-0 animate-note-open">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <Button asChild variant="ghost" size="sm" className="-ml-2 text-muted-foreground">
