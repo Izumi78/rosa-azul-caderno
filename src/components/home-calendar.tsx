@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { addDays, format, isSameDay, parseISO, startOfDay } from "date-fns";
+import { format, parseISO, startOfDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CalendarDays, Clock3, Plus, Sparkles, NotebookPen, Trash2 } from "lucide-react";
 
