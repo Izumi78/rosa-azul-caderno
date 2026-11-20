@@ -24,7 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { connectedNotes, type Note } from "@/lib/notes-model";
 import { notesActions, useNotesState } from "@/lib/notes-store";
-import { compressImageForNotes } from "@/lib/image-utils";
+import { compressImageBlobForNotes, saveMediaFile } from "@/lib/image-utils";
 import { saveNoteMedia, noteMediaRef } from "@/lib/note-media-store";
 import { cn } from "@/lib/utils";
 
@@ -181,26 +181,34 @@ function NoteEditor({ note }: { note: Note }) {
   };
   const addFileAttachment = async (file: File) => {
     const name = file.name.replace(/[\\[\\]()]/g, "_");
-    const isImage = file.type.startsWith("image/");
-    const isVideo = file.type.startsWith("video/") && ["video/mp4", "video/webm", "video/ogg", "video/quicktime"].includes(file.type);
-    const maxBytes = isVideo ? 100 * 1024 * 1024 : isImage ? 15 * 1024 * 1024 : 25 * 1024 * 1024;
-    if (!isImage && !isVideo && file.size > maxBytes) {
-      window.alert("Este arquivo ultrapassa o limite de 25 MB.");
-      return;
-    }
-    if (isVideo && file.size > maxBytes) {
-      window.alert("Vídeos podem ter no máximo 100 MB. Para vídeos maiores, adicione um link do YouTube ou Vimeo.");
-      return;
-    }
-    if (!isImage && !isVideo && file.size > maxBytes) return;
     try {
-      const blob = isImage ? await (await fetch(await compressImageForNotes(file))).blob() : file;
-      const mediaId = await saveNoteMedia(blob);
-      const reference = noteMediaRef(mediaId);
-      const markdown = isImage ? `![${name}](${reference})` : isVideo ? `[▶ Assistir ${name}](${reference})` : `[Baixar ${name}](${reference})`;
-      saveContent(note.content + (note.content.endsWith("\n") ? "" : "\n\n") + markdown + "\n");
+      if (file.type.startsWith("image/")) {
+        const compressed = await compressImageBlobForNotes(file);
+        const reference = await saveMediaFile(new File([compressed], name, { type: compressed.type }));
+        saveContent(note.content + (note.content.endsWith("\n") ? "" : "\n\n") + "![" + name + "](" + reference + ")\n");
+        return;
+      }
+      if (file.type.startsWith("video/")) {
+        if (!["video/mp4", "video/webm"].includes(file.type)) {
+          window.alert("Formato de vídeo não compatível. Use MP4 ou WebM.");
+          return;
+        }
+        const reference = await saveMediaFile(file);
+        saveContent(note.content + (note.content.endsWith("\n") ? "" : "\n\n") + "![Vídeo: " + name + "](" + reference + ")\n");
+        return;
+      }
+      if (file.size > 1024 * 1024) {
+        window.alert("Arquivo maior que 1 MB. Para manter o caderno leve, anexe um arquivo menor ou use um link.");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        const data = String(reader.result || "");
+        saveContent(note.content + (note.content.endsWith("\n") ? "" : "\n\n") + "[" + name + "](" + data + ")\n");
+      };
+      reader.readAsDataURL(file);
     } catch (error) {
-      window.alert(error instanceof Error ? error.message : "Não foi possível anexar este arquivo. Verifique o espaço disponível no navegador.");
+      window.alert(error instanceof Error ? error.message : "Não foi possível anexar este arquivo.");
     }
   };
   const handlePaste = async (event: ClipboardEvent<HTMLTextAreaElement>) => {
