@@ -24,7 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { connectedNotes, type Note } from "@/lib/notes-model";
 import { notesActions, useNotesState } from "@/lib/notes-store";
-import { compressImageBlobForNotes, getMediaFile, getMediaId, saveMediaFile } from "@/lib/image-utils";
+import { compressImageBlobForNotes, saveMediaFile } from "@/lib/image-utils";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/nota/$id")({
