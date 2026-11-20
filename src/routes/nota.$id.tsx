@@ -25,6 +25,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { connectedNotes, type Note } from "@/lib/notes-model";
 import { notesActions, useNotesState } from "@/lib/notes-store";
 import { compressImageForNotes } from "@/lib/image-utils";
+import { saveNoteMedia, noteMediaRef } from "@/lib/note-media-store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/nota/$id")({
@@ -159,31 +160,38 @@ function NoteEditor({ note }: { note: Note }) {
   };
   const addFileAttachment = async (file: File) => {
     const name = file.name.replace(/[\\[\\]()]/g, "_");
-    if (file.type.startsWith("image/")) {
-      try {
-        const data = await compressImageForNotes(file);
-        saveContent(note.content + (note.content.endsWith("\n") ? "" : "\n\n") + "![" + name + "](" + data + ")\n");
-      } catch (error) {
-        window.alert(error instanceof Error ? error.message : "Não foi possível anexar a imagem.");
-      }
+    const isImage = file.type.startsWith("image/");
+    const isVideo = file.type.startsWith("video/") && ["video/mp4", "video/webm", "video/ogg", "video/quicktime"].includes(file.type);
+    const maxBytes = isVideo ? 100 * 1024 * 1024 : isImage ? 15 * 1024 * 1024 : 25 * 1024 * 1024;
+    if (!isImage && !isVideo && file.size > maxBytes) {
+      window.alert("Este arquivo ultrapassa o limite de 25 MB.");
       return;
     }
-    if (file.size > 1024 * 1024) { window.alert("Arquivo maior que 1 MB. Para manter o caderno leve, anexe um arquivo menor ou use um link."); return; }
-    const reader = new FileReader();
-    reader.onload = () => {
-      const data = String(reader.result || "");
-      saveContent(note.content + (note.content.endsWith("\n") ? "" : "\n\n") + "[" + name + "](" + data + ")\n");
-    };
-    reader.readAsDataURL(file);
+    if (isVideo && file.size > maxBytes) {
+      window.alert("Vídeos podem ter no máximo 100 MB. Para vídeos maiores, adicione um link do YouTube ou Vimeo.");
+      return;
+    }
+    if (!isImage && !isVideo && file.size > maxBytes) return;
+    try {
+      const blob = isImage ? await (await fetch(await compressImageForNotes(file))).blob() : file;
+      const mediaId = await saveNoteMedia(blob);
+      const reference = noteMediaRef(mediaId);
+      const markdown = isImage ? `![${name}](${reference})` : isVideo ? `[▶ Assistir ${name}](${reference})` : `[Baixar ${name}](${reference})`;
+      saveContent(note.content + (note.content.endsWith("\n") ? "" : "\n\n") + markdown + "\n");
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : "Não foi possível anexar este arquivo. Verifique o espaço disponível no navegador.");
+    }
   };
   const handlePaste = async (event: ClipboardEvent<HTMLTextAreaElement>) => {
     const file = Array.from(event.clipboardData.items).find((item) => item.type.startsWith("image/"))?.getAsFile();
     if (!file) return;
     event.preventDefault();
     try {
-      const data = await compressImageForNotes(file);
+      const blob = await (await fetch(await compressImageForNotes(file))).blob();
+      const mediaId = await saveNoteMedia(blob);
+      const reference = noteMediaRef(mediaId);
       const el = textRef.current, value = note.content, start = el?.selectionStart ?? value.length, end = el?.selectionEnd ?? value.length;
-      saveContent(value.slice(0, start) + "\n![Imagem colada](" + data + ")\n" + value.slice(end));
+      saveContent(value.slice(0, start) + "\n![Imagem colada](" + reference + ")\n" + value.slice(end));
     } catch (error) {
       window.alert(error instanceof Error ? error.message : "Não foi possível colar esta imagem.");
     }
@@ -306,7 +314,7 @@ function NoteEditor({ note }: { note: Note }) {
 <Button type="button" variant="ghost" size="icon" title="Separador" aria-label="Separador" onClick={() => insertLinePrefix("---\n")}><span className="text-xs font-bold">—</span></Button><Button type="button" variant="ghost" size="icon" title="Inserir tabela" aria-label="Inserir tabela" onClick={insertTable}><Table className="h-4 w-4" /></Button><Button type="button" variant="ghost" size="icon" title="Desfazer (Ctrl+Z)" aria-label="Desfazer" onClick={undoContent} disabled={undoStack.current.length === 0}><Undo2 className="h-4 w-4" /></Button><Button type="button" variant="ghost" size="icon" title="Refazer (Ctrl+Y)" aria-label="Refazer" onClick={redoContent} disabled={redoStack.current.length === 0}><Redo2 className="h-4 w-4" /></Button>
 <span className="mx-1 h-5 w-px bg-border" />
 <Button type="button" variant="ghost" size="sm" className="gap-1.5" title="Inserir imagem ou arquivo" onClick={() => fileRef.current?.click()}><FileImage className="h-4 w-4" />Imagem/Arquivo</Button>
-<input ref={fileRef} type="file" accept="image/*,video/mp4,video/webm,application/pdf,text/plain" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) addFileAttachment(file); e.currentTarget.value = ""; }} />
+<input ref={fileRef} type="file" accept="image/*,video/mp4,video/webm,video/ogg,video/quicktime,application/pdf,text/plain" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) addFileAttachment(file); e.currentTarget.value = ""; }} />
 </div>
 <textarea
                 ref={textRef}
