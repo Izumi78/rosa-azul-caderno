@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { LayoutGrid, Waypoints, Settings2, Sun, Moon, Search, Sparkles } from "lucide-react";
+import { LayoutGrid, Waypoints, Settings2, Sun, Moon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Wordmark } from "./logo";
 
@@ -31,8 +31,6 @@ export function SiteHeader() {
         <Link to="/" activeOptions={{ exact: true }} className={itemClass} activeProps={{ className: "is-active" }}><LayoutGrid className="h-5 w-5" />Blocos</Link>
         <Link to="/mural" className={itemClass} activeProps={{ className: "is-active" }}><Waypoints className="h-5 w-5" />Mural</Link>
         <div className="my-2 h-px w-8 bg-border" />
-        <Link to="/" className={itemClass}><Search className="h-5 w-5" />Buscar</Link>
-        <Link to="/" className={itemClass}><Sparkles className="h-5 w-5" />Íris</Link>
         <div className="flex-1" />
         <button type="button" className={itemClass} onClick={() => setSettingsOpen((v) => !v)} aria-expanded={settingsOpen}><Settings2 className="h-5 w-5" />Ajustes</button>
       </aside>
