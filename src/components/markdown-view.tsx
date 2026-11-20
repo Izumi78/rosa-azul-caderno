@@ -86,11 +86,13 @@ export function MarkdownView({ source, className, style }: { source: string; cla
         }}
         components={{
           img: ({ src, alt }) => {
+            if (src?.startsWith("rosa-media:")) return <StoredMedia id={src.slice("rosa-media:".length)} alt={alt} />;
             const embed = (alt?.toLowerCase().includes("vídeo") || alt?.toLowerCase().includes("video")) ? videoEmbedUrl(src) : null;
             if (embed) return <div className="my-5 aspect-video overflow-hidden rounded-xl border border-border bg-black shadow-sm"><iframe src={embed} title="Vídeo incorporado" className="h-full w-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen loading="lazy" referrerPolicy="strict-origin-when-cross-origin" /></div>;
             return <img src={src} alt={alt || ""} loading="lazy" className="my-4 max-h-[600px] max-w-full rounded-lg border border-border object-contain" />;
           },
           a: ({ children, href }) => {
+            if (href?.startsWith("rosa-media:")) return <StoredMediaLink id={href.slice("rosa-media:".length)}>{children}</StoredMediaLink>;
             if (href?.startsWith("data:video/")) return <video src={href} controls preload="metadata" className="my-4 max-h-[520px] w-full rounded-xl border border-border bg-black" />;
             return <a href={href} target="_blank" rel="noreferrer noopener">{children}</a>;
           },
