@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MuralRouteImport } from './routes/mural'
+import { Route as TarefasRouteImport } from './routes/tarefas'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as NotaIdRouteImport } from './routes/nota.$id'
 
@@ -22,6 +23,11 @@ const IndexRoute = IndexRouteImport.update({
 const MuralRoute = MuralRouteImport.update({
   id: '/mural',
   path: '/mural',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TarefasRoute = TarefasRouteImport.update({
+  id: '/tarefas',
+  path: '/tarefas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiChatRoute = ApiChatRouteImport.update({
@@ -38,12 +44,14 @@ const NotaIdRoute = NotaIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/mural': typeof MuralRoute
+  '/tarefas': typeof TarefasRoute
   '/api/chat': typeof ApiChatRoute
   '/nota/$id': typeof NotaIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/mural': typeof MuralRoute
+  '/tarefas': typeof TarefasRoute
   '/api/chat': typeof ApiChatRoute
   '/nota/$id': typeof NotaIdRoute
 }
@@ -51,20 +59,22 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/mural': typeof MuralRoute
+  '/tarefas': typeof TarefasRoute
   '/api/chat': typeof ApiChatRoute
   '/nota/$id': typeof NotaIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/mural' | '/api/chat' | '/nota/$id'
+  fullPaths: '/' | '/mural' | '/tarefas' | '/api/chat' | '/nota/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/mural' | '/api/chat' | '/nota/$id'
-  id: '__root__' | '/' | '/mural' | '/api/chat' | '/nota/$id'
+  to: '/' | '/mural' | '/tarefas' | '/api/chat' | '/nota/$id'
+  id: '__root__' | '/' | '/mural' | '/tarefas' | '/api/chat' | '/nota/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   MuralRoute: typeof MuralRoute
+  TarefasRoute: typeof TarefasRoute
   ApiChatRoute: typeof ApiChatRoute
   NotaIdRoute: typeof NotaIdRoute
 }
@@ -83,6 +93,13 @@ declare module '@tanstack/react-router' {
       path: '/mural'
       fullPath: '/mural'
       preLoaderRoute: typeof MuralRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tarefas': {
+      id: '/tarefas'
+      path: '/tarefas'
+      fullPath: '/tarefas'
+      preLoaderRoute: typeof TarefasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/chat': {
@@ -105,6 +122,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   MuralRoute: MuralRoute,
+  TarefasRoute: TarefasRoute,
   ApiChatRoute: ApiChatRoute,
   NotaIdRoute: NotaIdRoute,
 }
