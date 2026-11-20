@@ -91,8 +91,11 @@ function MuralPage() {
   }, []);
 
   function canvasPoint(e: { clientX: number; clientY: number }) {
-    const rect = canvasRef.current?.getBoundingClientRect();
-    return { x: (e.clientX - (rect?.left ?? 0)) / camera.scale, y: (e.clientY - (rect?.top ?? 0)) / camera.scale };
+    const rect = viewportRef.current?.getBoundingClientRect();
+    return {
+      x: (e.clientX - (rect?.left ?? 0) - camera.x) / camera.scale,
+      y: (e.clientY - (rect?.top ?? 0) - camera.y) / camera.scale,
+    };
   }
 
   function onViewportPointerDown(e: ReactPointerEvent<HTMLDivElement>) {
@@ -174,7 +177,7 @@ function MuralPage() {
               ? selected
                 ? "Agora clique no bloco que tem a ver com este."
                 : "Clique em um bloco e depois em outro para ligá-los."
-              : "Arraste o fundo para explorar o espaço, use a roda do mouse para aproximar ou afastar e arraste os blocos para organizá-los."}
+              : "Arraste cada bloco para qualquer ponto do espaço. Arraste o fundo para navegar e use o scroll para controlar o zoom."}
           </p>
         </div>
         <div className="flex items-center gap-2">
