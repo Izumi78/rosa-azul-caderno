@@ -233,7 +233,7 @@ function NoteEditor({ note }: { note: Note }) {
           <label className="flex flex-col gap-1 text-xs text-muted-foreground">Papel<select value={style.paper} onChange={(e) => notesActions.update(note.id, { style: { ...style, paper: e.target.value as typeof style.paper } })} className="h-9 rounded-md border border-border bg-background px-2 text-sm text-foreground"><option value="cream">Creme</option><option value="lavender">Lavanda</option><option value="blue">Azul claro</option><option value="dark">Escuro</option></select></label>
           <Button type="button" variant="ghost" size="sm" onClick={() => notesActions.update(note.id, { style: { font: "serif", size: 18, paper: "cream" } })}>Restaurar padrão</Button>
         </div>}
-        <article style={{ backgroundColor: paperColors[style.paper], color: textColor }} className="paper-ruled relative min-h-[75vh] overflow-hidden rounded-lg border border-border pb-16 pl-16 pr-6 pt-8 shadow-lift sm:pr-12">
+        <article style={{ backgroundColor: paperColors[style.paper], color: textColor }} className="paper-grid rosa-grid-paper relative min-h-[75vh] overflow-hidden rounded-[1.4rem] border border-border pb-16 pl-8 pr-6 pt-8 shadow-lift sm:pl-10 sm:pr-12">
           <span className={cn("absolute inset-x-0 top-0 h-1.5", NOTE_COLOR_BG[note.color])} />
           <input
             value={note.title}
