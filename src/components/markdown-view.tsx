@@ -26,7 +26,13 @@ export function MarkdownView({ source, className }: { source: string; className?
     >
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkBreaks]}
-        urlTransform={(url, key) => {\n          const safeData = /^data:(image\\/(?:jpeg|png|gif|webp)|application\\/pdf|text\\/plain);base64,[A-Za-z0-9+/=]+$/.test(url);\n          if (safeData && (key === "src" || key === "href")) return url;\n          return defaultUrlTransform(url, key);\n        }}\n        components={{
+        urlTransform={(url, key) => {
+          const safeData =
+            /^data:(image\/(?:jpeg|png|gif|webp)|application\/pdf|text\/plain);base64,[A-Za-z0-9+/=]+$/.test(url);
+          if (safeData && (key === "src" || key === "href")) return url;
+          return defaultUrlTransform(url);
+        }}
+        components={{
           a: ({ children, href }) => (
             <a href={href} target="_blank" rel="noreferrer noopener">
               {children}

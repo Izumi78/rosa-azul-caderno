@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, Bold, Check, Code2, Eye, FileImage, Heading2, Italic, Link2, List, PenLine, Quote, Sparkles, Trash2, Waypoints } from "lucide-react";
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState, type ClipboardEvent } from "react";
 
 import { AiAssistant } from "@/components/ai-assistant";
 import { ColorPicker } from "@/components/color-picker";
@@ -104,7 +104,7 @@ function NoteEditor({ note }: { note: Note }) {
     };
     reader.readAsDataURL(file);
   };
-  const handlePaste = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
+  const handlePaste = (event: ClipboardEvent<HTMLTextAreaElement>) => {
     const file = Array.from(event.clipboardData.items).find((item) => item.type.startsWith("image/"))?.getAsFile();
     if (!file) return; event.preventDefault();
     const reader = new FileReader();
@@ -185,6 +185,7 @@ function NoteEditor({ note }: { note: Note }) {
           />
           <div className="mt-8">
             {mode === "write" ? (
+              <>
               <div className="rosa-editor-tools mb-3 flex flex-wrap items-center gap-1 rounded-2xl border border-primary/10 bg-paper/70 p-2 shadow-sm backdrop-blur">
 <Button type="button" variant="ghost" size="icon" title="Negrito" aria-label="Negrito" onClick={() => insertAtCursor("**", "**")}><Bold className="h-4 w-4" /></Button>
 <Button type="button" variant="ghost" size="icon" title="Itálico" aria-label="Itálico" onClick={() => insertAtCursor("*", "*")}><Italic className="h-4 w-4" /></Button>
@@ -205,6 +206,7 @@ function NoteEditor({ note }: { note: Note }) {
                 aria-label="Conteúdo da página"
                 className="block min-h-[55vh] w-full resize-none overflow-hidden bg-transparent font-serif text-lg leading-8 text-foreground outline-none placeholder:text-muted-foreground/60"
               />
+              </>
             ) : note.content.trim() ? (
               <MarkdownView source={note.content} className="text-lg" />
             ) : (
