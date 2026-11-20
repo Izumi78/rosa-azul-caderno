@@ -156,7 +156,7 @@ function NoteEditor({ note }: { note: Note }) {
     requestAnimationFrame(() => { if (el) { el.focus(); el.setSelectionRange(start + prefix.length, start + prefix.length); } });
   };
   const addFileAttachment = (file: File) => {
-    if (file.size > 400 * 1024) { window.alert("Arquivo maior que 400 KB. Anexe um arquivo menor para manter o caderno leve."); return; }
+    if (file.size > 1024 * 1024) { window.alert("Arquivo maior que 1 MB. Para manter o caderno leve, anexe um arquivo menor ou use um link de vídeo."); return; }
     const reader = new FileReader();
     reader.onload = () => { const data = String(reader.result || ""), name = file.name.replace(/[\[\]()]/g, "_");
       saveContent(note.content + (note.content.endsWith("\n") ? "" : "\n\n") + "[" + name + "](" + data + ")\n");
@@ -276,7 +276,7 @@ function NoteEditor({ note }: { note: Note }) {
 <Button type="button" variant="ghost" size="icon" title="Separador" aria-label="Separador" onClick={() => insertLinePrefix("---\n")}><span className="text-xs font-bold">—</span></Button><Button type="button" variant="ghost" size="icon" title="Inserir tabela" aria-label="Inserir tabela" onClick={insertTable}><Table className="h-4 w-4" /></Button><Button type="button" variant="ghost" size="icon" title="Desfazer (Ctrl+Z)" aria-label="Desfazer" onClick={undoContent} disabled={undoStack.current.length === 0}><Undo2 className="h-4 w-4" /></Button><Button type="button" variant="ghost" size="icon" title="Refazer (Ctrl+Y)" aria-label="Refazer" onClick={redoContent} disabled={redoStack.current.length === 0}><Redo2 className="h-4 w-4" /></Button>
 <span className="mx-1 h-5 w-px bg-border" />
 <Button type="button" variant="ghost" size="sm" className="gap-1.5" title="Inserir imagem ou arquivo" onClick={() => fileRef.current?.click()}><FileImage className="h-4 w-4" />Imagem/Arquivo</Button>
-<input ref={fileRef} type="file" accept="image/*,application/pdf,text/plain" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) addFileAttachment(file); e.currentTarget.value = ""; }} />
+<input ref={fileRef} type="file" accept="image/*,video/mp4,video/webm,application/pdf,text/plain" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) addFileAttachment(file); e.currentTarget.value = ""; }} />
 </div>
 <textarea
                 ref={textRef}
