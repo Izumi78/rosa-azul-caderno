@@ -6,9 +6,10 @@ import { cn } from "@/lib/utils";
 
 import { ChartBlock } from "./chart-block";
 
-export function MarkdownView({ source, className }: { source: string; className?: string }) {
+export function MarkdownView({ source, className, style }: { source: string; className?: string; style?: React.CSSProperties }) {
   return (
     <div
+      style={style}
       className={cn(
         "space-y-3 break-words font-serif leading-relaxed text-foreground",
         "[&_h1]:mt-4 [&_h1]:font-display [&_h1]:text-3xl [&_h1]:font-semibold",
