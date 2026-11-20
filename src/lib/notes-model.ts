@@ -198,15 +198,14 @@ export function sampleData(now = Date.now()): NotesData {
       description: "Como usar seus blocos, o mural e a Íris, sua assistente.",
       color: "roxo",
       position: { x: 80, y: 80 },
-      content:
-        "# Bem-vindo 🌹
+      content: `# Bem-vindo 🌹
 
 Cada bloco é uma página inteira para escrever.
 
 - Use a aba **Links** para guardar referências.
 - Peça ajuda à **Íris** para organizar ideias, revisar textos, criar gráficos e relatórios.
 - No **Mural**, ligue blocos que tratam de assuntos parecidos.
-",
+`,
     }),
     base({
       id: "ideias-projeto",
@@ -214,9 +213,9 @@ Cada bloco é uma página inteira para escrever.
       description: "Rascunho solto de ideias para desenvolver depois.",
       color: "azul",
       position: { x: 440, y: 220 },
-      content: "- Um diário de leituras
+      content: `- Um diário de leituras
 - Planejar viagem de fim de ano
-- Estudar sobre jardinagem",
+- Estudar sobre jardinagem`,
     }),
     base({
       id: "leituras",
