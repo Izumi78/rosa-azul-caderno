@@ -1,5 +1,5 @@
 import ReactMarkdown, { defaultUrlTransform } from "react-markdown";
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 
@@ -26,7 +26,7 @@ function StoredMedia({ id, alt, video = false }: { id: string; alt?: string; vid
   return <img src={url} alt={alt || "Imagem anexada"} loading="lazy" className="my-4 max-h-[600px] max-w-full rounded-lg border border-border object-contain" />;
 }
 
-function StoredMediaLink({ id, children }: { id: string; children: React.ReactNode }) {
+function StoredMediaLink({ id, children }: { id: string; children: ReactNode }) {
   const [url, setUrl] = useState<string | null>(null);
   const [isVideo, setIsVideo] = useState(false);
   useEffect(() => {
