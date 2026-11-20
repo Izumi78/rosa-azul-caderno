@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Download, Plus, Search } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Download, Plus, Search, Upload } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
 
 import { NewNoteDialog } from "@/components/new-note-dialog";
 import { NoteCard } from "@/components/note-card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { useNotesState } from "@/lib/notes-store";
+import { notesActions, useNotesState } from "@/lib/notes-store";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -49,6 +49,7 @@ function exportBackup(notes: ReturnType<typeof useNotesState>["notes"], connecti
 function Index() {
   const { notes, connections, hydrated } = useNotesState();
   const [query, setQuery] = useState("");
+  const importRef = useRef<HTMLInputElement>(null);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -63,6 +64,22 @@ function Index() {
   }, [notes, query]);
 
   const linkCount = (id: string) => connections.filter((c) => c.from === id || c.to === id).length;
+  const importBackup = async (file: File) => {
+    try {
+      const parsed = JSON.parse(await file.text());
+      if (parsed?.app !== "Rosa Azul" || !Array.isArray(parsed.notes) || !Array.isArray(parsed.connections)) {
+        window.alert("Arquivo de backup inválido.");
+        return;
+      }
+      const notesValid = parsed.notes.every((n: any) => n && typeof n.id === "string" && typeof n.title === "string" && typeof n.content === "string");
+      const connectionsValid = parsed.connections.every((c: any) => c && typeof c.id === "string" && typeof c.from === "string" && typeof c.to === "string");
+      if (!notesValid || !connectionsValid) { window.alert("Backup incompleto ou inválido. Nada foi alterado."); return; }
+      if (!window.confirm("Importar " + parsed.notes.length + " notas? Isso substituirá o conteúdo atual. Faça backup antes.")) return;
+      notesActions.restoreBackup({ notes: parsed.notes, connections: parsed.connections });
+      window.alert("Backup restaurado!");
+    } catch { window.alert("Não foi possível ler esse arquivo JSON."); }
+  };
+
 
   return (
     <div className="rosa-home mx-auto max-w-7xl px-4 pb-20 pt-8 sm:px-6">
@@ -87,7 +104,7 @@ function Index() {
               aria-label="Buscar blocos"
             />
           </div>
-          <div className="flex items-center gap-2"><Button type="button" variant="outline" className="h-11 rounded-full border-white/40 bg-white/35 shadow-sm backdrop-blur-lg" onClick={() => exportBackup(notes, connections)} disabled={!hydrated} title="Baixar cópia de segurança de todas as notas e conexões"><Download className="h-4 w-4" /> Backup</Button><NewNoteDialog /></div>
+          <div className="flex items-center gap-2"><Button type="button" variant="outline" className="h-11 rounded-full border-white/40 bg-white/35 shadow-sm backdrop-blur-lg" onClick={() => exportBackup(notes, connections)} disabled={!hydrated} title="Baixar cópia de segurança de todas as notas e conexões"><Download className="h-4 w-4" /> Backup</Button><Button type="button" variant="outline" className="h-11 rounded-full border-white/40 bg-white/35 shadow-sm backdrop-blur-lg" onClick={() => importRef.current?.click()} disabled={!hydrated} title="Restaurar backup JSON"><Upload className="h-4 w-4" /> Restaurar</Button><input ref={importRef} type="file" accept=".json,application/json" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) void importBackup(file); e.currentTarget.value = ""; }} /><NewNoteDialog /></div>
         </div>
       </section>
 
