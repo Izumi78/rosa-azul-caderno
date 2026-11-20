@@ -1,6 +1,6 @@
 import { UserRound } from "lucide-react";
 
-const portrait = "data:image/jpeg;base64,BASE64_PLACEHOLDER";
+const portrait = "data:image/jpeg;base64,PUT_BASE64_HERE";
 
 export function ProfileAvatar() {
   return (
