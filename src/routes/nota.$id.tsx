@@ -194,7 +194,7 @@ function NoteEditor({ note }: { note: Note }) {
 <Button type="button" variant="ghost" size="icon" title="Código" aria-label="Código" onClick={() => insertAtCursor("`", "`")}><Code2 className="h-4 w-4" /></Button>
 <span className="mx-1 h-5 w-px bg-border" />
 <Button type="button" variant="ghost" size="sm" className="gap-1.5" title="Inserir imagem ou arquivo" onClick={() => fileRef.current?.click()}><FileImage className="h-4 w-4" />Imagem/Arquivo</Button>
-<input ref={fileRef} type="file" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) addFileAttachment(file); e.currentTarget.value = ""; }} />
+<input ref={fileRef} type="file" accept="image/*,application/pdf,text/plain" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) addFileAttachment(file); e.currentTarget.value = ""; }} />
 </div>
 <textarea
                 ref={textRef}
