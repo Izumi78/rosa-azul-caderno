@@ -6,8 +6,10 @@ import remarkGfm from "remark-gfm";
 import { cn } from "@/lib/utils";
 
 import { ChartBlock } from "./chart-block";
+import { getNoteMedia } from "@/lib/note-media-store";
+import { useEffect, useState } from "react";
 
-function videoEmbedUrl(raw?: string) {
+function StoredMedia({ id, alt, video = false }: { id: string; alt?: string; video?: boolean }) {\n  const [url, setUrl] = useState<string | null>(null);\n  useEffect(() => {\n    let active = true;\n    let objectUrl = "";\n    getNoteMedia(id).then((blob) => {\n      if (!active || !blob) return;\n      objectUrl = URL.createObjectURL(blob);\n      setUrl(objectUrl);\n    }).catch(() => setUrl(null));\n    return () => { active = false; if (objectUrl) URL.revokeObjectURL(objectUrl); };\n  }, [id]);\n  if (!url) return <div className="my-4 rounded-lg border border-border bg-secondary/60 px-4 py-6 text-center text-sm text-muted-foreground">{video ? "Carregando vídeo…" : "Carregando imagem…"}</div>;\n  if (video) return <video src={url} controls preload="metadata" playsInline className="my-4 max-h-[520px] w-full rounded-xl border border-border bg-black" />;\n  return <img src={url} alt={alt || "Imagem anexada"} loading="lazy" className="my-4 max-h-[600px] max-w-full rounded-lg border border-border object-contain" />;\n}\n\nfunction StoredMediaLink({ id, children }: { id: string; children: React.ReactNode }) {\n  const [url, setUrl] = useState<string | null>(null);\n  const [isVideo, setIsVideo] = useState(false);\n  useEffect(() => {\n    let active = true;\n    let objectUrl = "";\n    getNoteMedia(id).then((blob) => {\n      if (!active || !blob) return;\n      setIsVideo(blob.type.startsWith("video/"));\n      objectUrl = URL.createObjectURL(blob);\n      setUrl(objectUrl);\n    }).catch(() => setUrl(null));\n    return () => { active = false; if (objectUrl) URL.revokeObjectURL(objectUrl); };\n  }, [id]);\n  if (!url) return <span className="text-muted-foreground">{children} (mídia indisponível)</span>;\n  if (isVideo) return <video src={url} controls preload="metadata" playsInline className="my-4 max-h-[520px] w-full rounded-xl border border-border bg-black" />;\n  return <a href={url} download className="text-rose underline underline-offset-2">{children}</a>;\n}\n\nfunction videoEmbedUrl(raw?: string) {
   if (!raw) return null;
   try {
     const url = new URL(raw);
