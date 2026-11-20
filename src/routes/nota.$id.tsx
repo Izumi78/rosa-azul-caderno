@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Bold, Check, Code2, Eye, FileImage, Heading2, ImagePlus, Italic, Link2, List, ListOrdered, PenLine, Quote, Sparkles, Strikethrough, Trash2, Waypoints } from "lucide-react";
+import { ArrowLeft, Bold, Check, Code2, Eye, FileImage, Heading2, ImagePlus, Italic, Link2, List, ListOrdered, PenLine, Quote, Sparkles, Strikethrough, Trash2, Waypoints, Undo2, Redo2, Table } from "lucide-react";
 import { useLayoutEffect, useMemo, useRef, useState, type ClipboardEvent } from "react";
 
 import { AiAssistant } from "@/components/ai-assistant";
@@ -76,6 +76,31 @@ function NoteEditor({ note }: { note: Note }) {
   const textRef = useRef<HTMLTextAreaElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const coverUploadRef = useRef<HTMLInputElement>(null);
+  const undoStack = useRef<string[]>([]);
+  const redoStack = useRef<string[]>([]);
+  const historyCurrent = useRef(note.content);
+  const saveContent = (next: string) => {
+    if (next === historyCurrent.current) return;
+    undoStack.current.push(historyCurrent.current);
+    if (undoStack.current.length > 100) undoStack.current.shift();
+    redoStack.current = [];
+    historyCurrent.current = next;
+    notesActions.update(note.id, { content: next });
+  };
+  const undoContent = () => {
+    const previous = undoStack.current.pop();
+    if (previous === undefined) return;
+    redoStack.current.push(historyCurrent.current);
+    historyCurrent.current = previous;
+    notesActions.update(note.id, { content: previous });
+  };
+  const redoContent = () => {
+    const next = redoStack.current.pop();
+    if (next === undefined) return;
+    undoStack.current.push(historyCurrent.current);
+    historyCurrent.current = next;
+    notesActions.update(note.id, { content: next });
+  };
   const related = useMemo(() => connectedNotes(state, note.id), [state, note.id]);
 
   useLayoutEffect(() => {
@@ -91,8 +116,20 @@ function NoteEditor({ note }: { note: Note }) {
   const insertAtCursor = (before: string, after = before, placeholder = "texto") => {
     const el = textRef.current, value = note.content, start = el?.selectionStart ?? value.length, end = el?.selectionEnd ?? value.length;
     const selected = value.slice(start, end) || placeholder;
-    notesActions.update(note.id, { content: value.slice(0, start) + before + selected + after + value.slice(end) });
+    saveContent(value.slice(0, start) + before + selected + after + value.slice(end));
     requestAnimationFrame(() => { if (el) { el.focus(); el.setSelectionRange(start + before.length, start + before.length + selected.length); } });
+  };
+  const insertTable = () => {
+    const rawRows = window.prompt("Quantas linhas de conteúdo? (1 a 8)", "2");
+    if (rawRows === null) return;
+    const rawCols = window.prompt("Quantas colunas? (1 a 6)", "3");
+    if (rawCols === null) return;
+    const rows = Math.min(8, Math.max(1, Number(rawRows) || 2));
+    const cols = Math.min(6, Math.max(1, Number(rawCols) || 3));
+    const header = "| " + Array.from({ length: cols }, (_, i) => "Coluna " + (i + 1)).join(" | ") + " |";
+    const separator = "| " + Array.from({ length: cols }, () => "---").join(" | ") + " |";
+    const body = Array.from({ length: rows }, () => "| " + Array.from({ length: cols }, () => " ").join(" | ") + " |").join("\n");
+    insertAtCursor("", "", header + "\n" + separator + "\n" + body);
   };
   const insertLink = () => {
     const url = window.prompt("Cole ou digite o endereço do link:");
@@ -102,14 +139,14 @@ function NoteEditor({ note }: { note: Note }) {
   };
   const insertLinePrefix = (prefix: string) => {
     const el = textRef.current, value = note.content, start = el?.selectionStart ?? value.length, lineStart = value.lastIndexOf("\n", Math.max(0, start - 1)) + 1;
-    notesActions.update(note.id, { content: value.slice(0, lineStart) + prefix + value.slice(lineStart) });
+    saveContent(value.slice(0, lineStart) + prefix + value.slice(lineStart));
     requestAnimationFrame(() => { if (el) { el.focus(); el.setSelectionRange(start + prefix.length, start + prefix.length); } });
   };
   const addFileAttachment = (file: File) => {
     if (file.size > 400 * 1024) { window.alert("Arquivo maior que 400 KB. Anexe um arquivo menor para manter o caderno leve."); return; }
     const reader = new FileReader();
     reader.onload = () => { const data = String(reader.result || ""), name = file.name.replace(/[\[\]()]/g, "_");
-      notesActions.update(note.id, { content: note.content + (note.content.endsWith("\n") ? "" : "\n\n") + "[" + name + "](" + data + ")\n" });
+      saveContent(note.content + (note.content.endsWith("\n") ? "" : "\n\n") + "[" + name + "](" + data + ")\n");
     };
     reader.readAsDataURL(file);
   };
@@ -122,7 +159,7 @@ function NoteEditor({ note }: { note: Note }) {
       canvas.width = Math.max(1, Math.round(img.width * scale)); canvas.height = Math.max(1, Math.round(img.height * scale));
       const ctx = canvas.getContext("2d"); if (!ctx) return; ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       const data = canvas.toDataURL("image/jpeg", 0.72), el = textRef.current, value = note.content, start = el?.selectionStart ?? value.length, end = el?.selectionEnd ?? value.length;
-      notesActions.update(note.id, { content: value.slice(0, start) + "\n![Imagem colada](" + data + ")\n" + value.slice(end) });
+      saveContent(value.slice(0, start) + "\n![Imagem colada](" + data + ")\n" + value.slice(end));
     }; img.src = String(reader.result); };
     reader.readAsDataURL(file);
   };
@@ -216,7 +253,7 @@ function NoteEditor({ note }: { note: Note }) {
 <Button type="button" variant="ghost" size="icon" title="Lista numerada" aria-label="Lista numerada" onClick={() => insertLinePrefix("1. ")}><ListOrdered className="h-4 w-4" /></Button>
 <Button type="button" variant="ghost" size="icon" title="Checklist" aria-label="Checklist" onClick={() => insertLinePrefix("- [ ] ")}><Check className="h-4 w-4" /></Button>
 <Button type="button" variant="ghost" size="icon" title="Inserir link" aria-label="Inserir link" onClick={insertLink}><Link2 className="h-4 w-4" /></Button>
-<Button type="button" variant="ghost" size="icon" title="Separador" aria-label="Separador" onClick={() => insertLinePrefix("---\n")}><span className="text-xs font-bold">—</span></Button>
+<Button type="button" variant="ghost" size="icon" title="Separador" aria-label="Separador" onClick={() => insertLinePrefix("---\n")}><span className="text-xs font-bold">—</span></Button><Button type="button" variant="ghost" size="icon" title="Inserir tabela" aria-label="Inserir tabela" onClick={insertTable}><Table className="h-4 w-4" /></Button><Button type="button" variant="ghost" size="icon" title="Desfazer (Ctrl+Z)" aria-label="Desfazer" onClick={undoContent} disabled={undoStack.current.length === 0}><Undo2 className="h-4 w-4" /></Button><Button type="button" variant="ghost" size="icon" title="Refazer (Ctrl+Y)" aria-label="Refazer" onClick={redoContent} disabled={redoStack.current.length === 0}><Redo2 className="h-4 w-4" /></Button>
 <span className="mx-1 h-5 w-px bg-border" />
 <Button type="button" variant="ghost" size="sm" className="gap-1.5" title="Inserir imagem ou arquivo" onClick={() => fileRef.current?.click()}><FileImage className="h-4 w-4" />Imagem/Arquivo</Button>
 <input ref={fileRef} type="file" accept="image/*,application/pdf,text/plain" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) addFileAttachment(file); e.currentTarget.value = ""; }} />
@@ -224,9 +261,9 @@ function NoteEditor({ note }: { note: Note }) {
 <textarea
                 ref={textRef}
                 value={note.content}
-                onChange={(e) => notesActions.update(note.id, { content: e.target.value })}
+                onChange={(e) => saveContent(e.target.value)}
                 onPaste={handlePaste}
-                onKeyDown={(e) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "b") { e.preventDefault(); insertAtCursor("**", "**"); } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "i") { e.preventDefault(); insertAtCursor("*", "*"); } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") { e.preventDefault(); insertLink(); } }}
+                onKeyDown={(e) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "b") { e.preventDefault(); insertAtCursor("**", "**"); } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "i") { e.preventDefault(); insertAtCursor("*", "*"); } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") { e.preventDefault(); insertLink(); } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") { e.preventDefault(); if (e.shiftKey) redoContent(); else undoContent(); } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "y") { e.preventDefault(); redoContent(); } }}
                 placeholder="Comece a escrever… (dica: use # para títulos, - para listas)"
                 aria-label="Conteúdo da página"
                 className="block min-h-[55vh] w-full resize-none overflow-hidden bg-transparent font-serif text-lg leading-8 text-foreground outline-none placeholder:text-muted-foreground/60"
