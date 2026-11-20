@@ -1,6 +1,6 @@
 // Pure data rules for notebooks and the board. No browser APIs here so they stay testable.
 
-export type NoteColor = "roxo" | "azul" | "tinta";
+export type NoteColor = "roxo" | "azul" | "rosa" | "tinta";
 
 export interface NoteLink {
   id: string;
@@ -38,7 +38,7 @@ export interface NotesData {
   connections: Connection[];
 }
 
-export const NOTE_COLORS: NoteColor[] = ["roxo", "azul", "tinta"];
+export const NOTE_COLORS: NoteColor[] = ["roxo", "azul", "rosa", "tinta"];
 
 export function makeId(): string {
   return Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);

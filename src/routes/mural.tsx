@@ -31,6 +31,7 @@ const CARD_H = 124;
 const STROKE: Record<NoteColor, string> = {
   roxo: "var(--note-roxo)",
   azul: "var(--note-azul)",
+  rosa: "var(--note-rosa)",
   tinta: "var(--note-tinta)",
 };
 
@@ -120,7 +121,7 @@ function MuralPage() {
 
   return (
     <div className="flex h-[calc(100vh-4rem)] flex-col">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-background/80 px-4 py-3 sm:px-6">
+      <div className="glass relative z-10 flex flex-wrap items-center justify-between gap-3 rounded-none border-x-0 border-t-0 px-4 py-3 sm:px-6">
         <div>
           <h1 className="text-2xl font-semibold">Mural de ideias</h1>
           <p className="text-sm text-muted-foreground">
@@ -231,7 +232,7 @@ function MuralPage() {
                   onPointerUp={() => onCardPointerUp(n.id)}
                   onKeyDown={(e) => e.key === "Enter" && onCardPointerUp(n.id)}
                   className={cn(
-                    "group absolute flex touch-none select-none flex-col overflow-hidden rounded-lg border border-border bg-paper p-4 pl-5 shadow-paper transition-shadow animate-fade-up hover:shadow-lift",
+                    "vitrine group absolute flex touch-none select-none flex-col overflow-hidden rounded-2xl p-4 pl-5 transition-shadow animate-fade-up hover:shadow-lift",
                     linking ? "cursor-crosshair" : "cursor-grab active:cursor-grabbing",
                     isSel && "ring-2 ring-primary ring-offset-2 ring-offset-background",
                   )}

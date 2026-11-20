@@ -76,20 +76,30 @@
   --font-display: "Fraunces", Georgia, serif;
   --font-sans: "Manrope", system-ui, sans-serif;
   --font-serif: "Literata", Georgia, serif;
+  --font-hand: "Caveat", "Segoe Print", cursive;
   --color-note-roxo: var(--note-roxo);
   --color-note-azul: var(--note-azul);
+  --color-note-rosa: var(--note-rosa);
   --color-note-tinta: var(--note-tinta);
   --color-paper: var(--paper);
   --color-paper-line: var(--paper-line);
   --color-rose: var(--rose);
+  --color-blush: var(--blush);
+  --color-glass: var(--glass);
+  --color-glass-border: var(--glass-border);
 }
 
+/*
+ * Appearance preferences (src/lib/prefs-store.ts) write data-* attributes and the
+ * --editor-* / --page-width variables on <html>. These are the defaults.
+ */
 :root {
   --radius: 0.75rem;
   /* Buttery paper */
   --background: oklch(0.965 0.032 88);
   --paper: oklch(0.982 0.024 90);
-  --paper-line: oklch(0.86 0.04 250 / 45%);
+  --paper-line: oklch(0.8 0.05 255 / 38%);
+  --margin-line: oklch(0.62 0.14 355 / 38%);
   --foreground: oklch(0.21 0.025 285);
   --card: oklch(0.982 0.024 90);
   --card-foreground: oklch(0.21 0.025 285);
@@ -101,11 +111,13 @@
   --secondary: oklch(0.93 0.035 88);
   --secondary-foreground: oklch(0.25 0.03 285);
   --muted: oklch(0.935 0.03 88);
-  --muted-foreground: oklch(0.47 0.03 285);
+  --muted-foreground: oklch(0.46 0.03 285);
   /* Blue accent */
   --accent: oklch(0.9 0.045 255);
   --accent-foreground: oklch(0.32 0.12 258);
   --rose: oklch(0.5 0.17 258);
+  /* Soft rose accent */
+  --blush: oklch(0.6 0.15 355);
   --destructive: oklch(0.56 0.2 25);
   --destructive-foreground: oklch(0.98 0.02 90);
   --border: oklch(0.86 0.035 85);
@@ -113,6 +125,7 @@
   --ring: oklch(0.55 0.15 280);
   --note-roxo: oklch(0.48 0.18 298);
   --note-azul: oklch(0.52 0.16 255);
+  --note-rosa: oklch(0.62 0.15 355);
   --note-tinta: oklch(0.24 0.02 285);
   --chart-1: oklch(0.48 0.18 298);
   --chart-2: oklch(0.55 0.16 255);
@@ -127,53 +140,142 @@
   --sidebar-accent-foreground: oklch(0.32 0.12 258);
   --sidebar-border: oklch(0.86 0.035 85);
   --sidebar-ring: oklch(0.55 0.15 280);
+  /* Glass */
+  --glass: oklch(0.995 0.012 90 / 52%);
+  --glass-strong: oklch(0.995 0.012 90 / 78%);
+  --glass-border: oklch(1 0 0 / 75%);
+  --glass-edge: oklch(0.5 0.1 290 / 12%);
+  --glass-shine: linear-gradient(140deg, oklch(1 0 0 / 55%), oklch(1 0 0 / 0%) 42%);
+  --dot: oklch(0.6 0.05 80 / 8%);
+  --blob-1: oklch(0.82 0.1 355 / 50%);
+  --blob-2: oklch(0.8 0.09 255 / 48%);
+  --blob-3: oklch(0.74 0.12 300 / 36%);
   --shadow-paper: 0 1px 0 oklch(1 0 0 / 70%) inset, 0 1px 2px oklch(0.3 0.04 80 / 10%),
     0 8px 24px -12px oklch(0.3 0.06 80 / 25%);
-  --shadow-lift: 0 1px 0 oklch(1 0 0 / 70%) inset, 0 4px 8px oklch(0.3 0.04 80 / 10%),
-    0 22px 40px -18px oklch(0.35 0.12 290 / 35%);
+  --shadow-lift: 0 1px 0 oklch(1 0 0 / 70%) inset, 0 4px 8px oklch(0.3 0.04 80 / 8%),
+    0 24px 44px -20px oklch(0.35 0.12 290 / 38%);
+  --shadow-glass: 0 1px 0 oklch(1 0 0 / 85%) inset, 0 0 0 1px var(--glass-edge),
+    0 12px 32px -18px oklch(0.35 0.12 290 / 35%);
+  /* Writing surface */
+  --editor-font: var(--font-serif);
+  --editor-size: 18px;
+  --editor-line: 33px;
+  --page-width: 780px;
+  --card-min: 150px;
 }
 
+@media (min-width: 640px) {
+  :root {
+    --card-min: 200px;
+  }
+  :root[data-card-size="pequeno"] {
+    --card-min: 165px;
+  }
+  :root[data-card-size="grande"] {
+    --card-min: 260px;
+  }
+}
+@media (max-width: 639px) {
+  :root[data-card-size="pequeno"] {
+    --card-min: 128px;
+  }
+  :root[data-card-size="grande"] {
+    --card-min: 260px;
+  }
+}
+
+/* Rosa névoa: pink-tinted paper */
+:root[data-theme="nevoa"] {
+  --background: oklch(0.962 0.02 350);
+  --paper: oklch(0.986 0.01 350);
+  --card: oklch(0.986 0.01 350);
+  --popover: oklch(0.988 0.01 350);
+  --secondary: oklch(0.935 0.025 345);
+  --muted: oklch(0.94 0.02 345);
+  --border: oklch(0.87 0.03 345);
+  --input: oklch(0.87 0.03 345);
+  --sidebar: oklch(0.955 0.02 345);
+  --sidebar-border: oklch(0.87 0.03 345);
+  --glass: oklch(0.995 0.008 350 / 52%);
+  --glass-strong: oklch(0.995 0.008 350 / 80%);
+  --dot: oklch(0.55 0.08 350 / 8%);
+  --blob-1: oklch(0.8 0.12 355 / 55%);
+}
+
+/* Lavanda: lilac paper */
+:root[data-theme="lavanda"] {
+  --background: oklch(0.955 0.022 295);
+  --paper: oklch(0.984 0.01 295);
+  --card: oklch(0.984 0.01 295);
+  --popover: oklch(0.986 0.01 295);
+  --secondary: oklch(0.93 0.025 295);
+  --muted: oklch(0.935 0.02 295);
+  --border: oklch(0.86 0.03 295);
+  --input: oklch(0.86 0.03 295);
+  --sidebar: oklch(0.948 0.02 295);
+  --sidebar-border: oklch(0.86 0.03 295);
+  --glass: oklch(0.995 0.008 295 / 50%);
+  --glass-strong: oklch(0.995 0.008 295 / 78%);
+  --dot: oklch(0.5 0.08 295 / 8%);
+  --blob-3: oklch(0.72 0.14 300 / 45%);
+}
+
+/* Noite azul (applied together with .dark) */
 .dark {
-  --background: oklch(0.2 0.02 285);
-  --paper: oklch(0.24 0.02 285);
-  --paper-line: oklch(0.5 0.06 260 / 30%);
-  --foreground: oklch(0.94 0.02 90);
-  --card: oklch(0.24 0.02 285);
-  --card-foreground: oklch(0.94 0.02 90);
-  --popover: oklch(0.24 0.02 285);
-  --popover-foreground: oklch(0.94 0.02 90);
-  --primary: oklch(0.72 0.14 298);
-  --primary-foreground: oklch(0.18 0.02 285);
-  --secondary: oklch(0.3 0.025 285);
-  --secondary-foreground: oklch(0.94 0.02 90);
-  --muted: oklch(0.3 0.025 285);
-  --muted-foreground: oklch(0.72 0.02 285);
-  --accent: oklch(0.35 0.07 258);
-  --accent-foreground: oklch(0.94 0.02 90);
-  --rose: oklch(0.7 0.13 255);
-  --destructive: oklch(0.65 0.19 25);
+  --background: oklch(0.19 0.03 272);
+  --paper: oklch(0.235 0.032 274);
+  --paper-line: oklch(0.6 0.08 260 / 22%);
+  --margin-line: oklch(0.7 0.12 355 / 30%);
+  --foreground: oklch(0.94 0.015 90);
+  --card: oklch(0.235 0.032 274);
+  --card-foreground: oklch(0.94 0.015 90);
+  --popover: oklch(0.24 0.03 274);
+  --popover-foreground: oklch(0.94 0.015 90);
+  --primary: oklch(0.74 0.14 298);
+  --primary-foreground: oklch(0.18 0.03 280);
+  --secondary: oklch(0.29 0.035 274);
+  --secondary-foreground: oklch(0.94 0.015 90);
+  --muted: oklch(0.29 0.035 274);
+  --muted-foreground: oklch(0.74 0.025 280);
+  --accent: oklch(0.34 0.07 258);
+  --accent-foreground: oklch(0.94 0.015 90);
+  --rose: oklch(0.74 0.12 255);
+  --blush: oklch(0.76 0.12 355);
+  --destructive: oklch(0.66 0.19 25);
   --destructive-foreground: oklch(0.98 0.02 90);
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.6 0.12 290);
-  --note-roxo: oklch(0.7 0.15 298);
-  --note-azul: oklch(0.7 0.13 255);
-  --note-tinta: oklch(0.85 0.02 285);
-  --chart-1: oklch(0.7 0.15 298);
-  --chart-2: oklch(0.7 0.13 255);
-  --chart-3: oklch(0.85 0.02 285);
-  --chart-4: oklch(0.6 0.12 300);
-  --chart-5: oklch(0.6 0.1 240);
-  --sidebar: oklch(0.22 0.02 285);
-  --sidebar-foreground: oklch(0.94 0.02 90);
-  --sidebar-primary: oklch(0.72 0.14 298);
-  --sidebar-primary-foreground: oklch(0.18 0.02 285);
-  --sidebar-accent: oklch(0.35 0.07 258);
-  --sidebar-accent-foreground: oklch(0.94 0.02 90);
+  --ring: oklch(0.65 0.12 290);
+  --note-roxo: oklch(0.72 0.15 298);
+  --note-azul: oklch(0.72 0.13 255);
+  --note-rosa: oklch(0.76 0.12 355);
+  --note-tinta: oklch(0.86 0.02 285);
+  --chart-1: oklch(0.72 0.15 298);
+  --chart-2: oklch(0.72 0.13 255);
+  --chart-3: oklch(0.86 0.02 285);
+  --chart-4: oklch(0.62 0.12 300);
+  --chart-5: oklch(0.62 0.1 240);
+  --sidebar: oklch(0.22 0.03 274);
+  --sidebar-foreground: oklch(0.94 0.015 90);
+  --sidebar-primary: oklch(0.74 0.14 298);
+  --sidebar-primary-foreground: oklch(0.18 0.03 280);
+  --sidebar-accent: oklch(0.34 0.07 258);
+  --sidebar-accent-foreground: oklch(0.94 0.015 90);
   --sidebar-border: oklch(1 0 0 / 12%);
-  --sidebar-ring: oklch(0.6 0.12 290);
-  --shadow-paper: 0 8px 24px -12px oklch(0 0 0 / 50%);
-  --shadow-lift: 0 22px 40px -18px oklch(0 0 0 / 60%);
+  --sidebar-ring: oklch(0.65 0.12 290);
+  --glass: oklch(0.3 0.04 274 / 45%);
+  --glass-strong: oklch(0.26 0.035 274 / 82%);
+  --glass-border: oklch(1 0 0 / 10%);
+  --glass-edge: oklch(0 0 0 / 30%);
+  --glass-shine: linear-gradient(140deg, oklch(1 0 0 / 10%), oklch(1 0 0 / 0%) 40%);
+  --dot: oklch(1 0 0 / 4%);
+  --blob-1: oklch(0.45 0.14 355 / 35%);
+  --blob-2: oklch(0.45 0.14 255 / 40%);
+  --blob-3: oklch(0.42 0.16 300 / 35%);
+  --shadow-paper: 0 8px 24px -12px oklch(0 0 0 / 55%);
+  --shadow-lift: 0 24px 44px -18px oklch(0 0 0 / 65%);
+  --shadow-glass: 0 1px 0 oklch(1 0 0 / 8%) inset, 0 0 0 1px var(--glass-edge),
+    0 16px 36px -18px oklch(0 0 0 / 60%);
 }
 
 @layer base {
@@ -181,15 +283,33 @@
     border-color: var(--color-border);
   }
 
+  html {
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
-    background-image: radial-gradient(
-      oklch(0.6 0.05 80 / 7%) 1px,
-      transparent 1px
-    );
+    background-image: radial-gradient(var(--dot) 1px, transparent 1px);
     background-size: 22px 22px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Soft rose / blue / purple light behind the glass */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(38% 34% at 8% 6%, var(--blob-1), transparent 70%),
+      radial-gradient(34% 40% at 96% 14%, var(--blob-2), transparent 70%),
+      radial-gradient(44% 38% at 72% 102%, var(--blob-3), transparent 70%);
   }
 
   h1,
@@ -211,11 +331,54 @@
   box-shadow: var(--shadow-lift);
 }
 
-/* Ruled notebook paper */
+/* Frosted glass panel */
+@utility glass {
+  background-color: var(--glass);
+  backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-glass);
+}
+
+@utility glass-strong {
+  background-color: var(--glass-strong);
+  backdrop-filter: blur(20px) saturate(170%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-glass);
+}
+
+/* The small glass showcase around each mini notebook */
+@utility vitrine {
+  position: relative;
+  background-color: var(--glass);
+  backdrop-filter: blur(14px) saturate(160%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-glass);
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: var(--glass-shine);
+    opacity: 0.7;
+    transition: opacity 300ms ease;
+  }
+}
+
+/* Mini notebook page with ruled lines */
+@utility mini-paper {
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(to right, transparent 1.15rem, var(--margin-line) 1.15rem, var(--margin-line) calc(1.15rem + 1px), transparent calc(1.15rem + 1px)),
+    repeating-linear-gradient(to bottom, transparent 0, transparent 17px, var(--paper-line) 17px, var(--paper-line) 18px);
+  background-position: 0 0, 0 1.6rem;
+}
+
+/* Kept for older markup: full ruled notebook paper */
 @utility paper-ruled {
   background-color: var(--paper);
   background-image:
-    linear-gradient(to right, transparent 3.25rem, color-mix(in oklab, var(--note-roxo) 30%, transparent) 3.25rem, color-mix(in oklab, var(--note-roxo) 30%, transparent) calc(3.25rem + 1px), transparent calc(3.25rem + 1px)),
+    linear-gradient(to right, transparent 3.25rem, var(--margin-line) 3.25rem, var(--margin-line) calc(3.25rem + 1px), transparent calc(3.25rem + 1px)),
     repeating-linear-gradient(to bottom, transparent 0, transparent calc(2rem - 1px), var(--paper-line) calc(2rem - 1px), var(--paper-line) 2rem);
   background-position: 0 0, 0 0.4rem;
 }
@@ -228,10 +391,63 @@
   background-size: 32px 32px;
 }
 
+@utility notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(var(--card-min), 100%), 1fr));
+  gap: clamp(0.85rem, 1.6vw, 1.4rem);
+}
+
+/* Typography chosen in "Personalizar" */
+@utility writing {
+  font-family: var(--editor-font);
+  font-size: var(--editor-size);
+  line-height: var(--editor-line);
+}
+
+/* Lines under the text; they follow the chosen line height */
+@utility writing-lines {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--editor-line) - 1px),
+    var(--paper-line) calc(var(--editor-line) - 1px),
+    var(--paper-line) var(--editor-line)
+  );
+}
+
+:root[data-paper="quadriculado"] .writing-lines {
+  background-image:
+    linear-gradient(var(--paper-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--paper-line) 1px, transparent 1px);
+  background-size: var(--editor-line) var(--editor-line);
+  background-position: 0 -1px;
+}
+
+:root[data-paper="liso"] .writing-lines {
+  background-image: none;
+}
+
+:root[data-card-style="papel"] .vitrine {
+  background-color: var(--paper);
+  backdrop-filter: none;
+  border-color: var(--border);
+  box-shadow: var(--shadow-paper);
+}
+:root[data-card-style="papel"] .vitrine::after {
+  opacity: 0;
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @keyframes note-open {
   0% {
     opacity: 0;
-    transform: perspective(1400px) translateY(18px) rotateX(6deg) scale(0.97);
+    transform: perspective(1400px) translateY(16px) rotateX(5deg) scale(0.975);
     transform-origin: top center;
   }
   100% {
@@ -264,15 +480,15 @@
 }
 
 @utility animate-note-open {
-  animation: note-open 380ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: note-open 360ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 @utility animate-fade-up {
-  animation: fade-up 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: fade-up 400ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 @utility animate-slide-in-right {
-  animation: slide-in-right 420ms cubic-bezier(0.2, 0.8, 0.2, 1) 120ms both;
+  animation: slide-in-right 400ms cubic-bezier(0.2, 0.8, 0.2, 1) 120ms both;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -283,44 +499,11 @@
   }
 }
 
-
-/* Rosa Azul — compact glass stationery */
-.rosa-home {
-  position: relative;
-}
-.rosa-home-hero {
-  padding: clamp(1rem, 2vw, 1.5rem);
-  border: 1px solid color-mix(in oklab, var(--primary) 12%, var(--border));
-  border-radius: 1.75rem;
-  background: linear-gradient(135deg, color-mix(in oklab, var(--paper) 88%, white), color-mix(in oklab, var(--accent) 24%, var(--paper)));
-  box-shadow: 0 16px 48px -30px color-mix(in oklab, var(--primary) 32%, transparent);
-}
-.rosa-note-grid {
-  align-items: stretch;
-}
-.rosa-note-glass {
-  background-color: color-mix(in oklab, var(--paper) 78%, white);
-  background-image: linear-gradient(135deg, color-mix(in oklab, white 28%, transparent), transparent 65%);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-color: color-mix(in oklab, var(--primary) 14%, var(--border));
-}
-.rosa-note-glass::after {
-  content: "";
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(140deg, color-mix(in oklab, white 26%, transparent), transparent 45%);
-  opacity: .45;
-}
-.rosa-create-card {
-  min-height: 230px;
-  border-radius: 1.5rem;
-  background: color-mix(in oklab, var(--paper) 40%, transparent);
-}
-@media (max-width: 640px) {
-  .rosa-home-hero { border-radius: 1.25rem; }
-  .rosa-note-grid { gap: .9rem; }
-  .rosa-note-glass { min-height: 205px; }
+/* "Reduzir animações" in Personalizar */
+:root[data-motion="reduzido"] *,
+:root[data-motion="reduzido"] *::before,
+:root[data-motion="reduzido"] *::after {
+  animation-duration: 1ms !important;
+  animation-delay: 0ms !important;
+  transition-duration: 1ms !important;
 }
