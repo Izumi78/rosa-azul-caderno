@@ -867,3 +867,116 @@
 }
 
 /* Workspace refresh verified on GitHub main. */
+
+
+/* Home: midnight violet glass workspace */
+.rosa-home-dark {
+  position: relative;
+  isolation: isolate;
+  min-height: calc(100vh - 4.5rem);
+  color: #f5f1ff;
+}
+.rosa-home-dark::before {
+  content:"";
+  position:fixed;
+  z-index:-1;
+  inset:4.5rem 0 0 5.25rem;
+  pointer-events:none;
+  background:
+    radial-gradient(ellipse at 18% 8%, oklch(0.38 0.19 300 / 34%), transparent 42%),
+    radial-gradient(ellipse at 86% 26%, oklch(0.34 0.17 270 / 27%), transparent 38%),
+    radial-gradient(ellipse at 55% 92%, oklch(0.25 0.13 315 / 35%), transparent 48%),
+    linear-gradient(145deg, #100d20 0%, #17102b 48%, #0c1023 100%);
+}
+.rosa-home-dark .rosa-home-hero {
+  border:1px solid oklch(1 0 0 / 10%);
+  background:
+    radial-gradient(ellipse at 15% 0%, oklch(0.58 0.18 300 / 25%), transparent 46%),
+    linear-gradient(135deg, oklch(0.25 0.07 292 / 76%), oklch(0.17 0.045 275 / 78%));
+  box-shadow:0 1px 0 oklch(1 0 0 / 8%) inset, 0 24px 70px -44px oklch(0.65 0.2 295 / 55%);
+  backdrop-filter:blur(24px) saturate(1.35);
+}
+.rosa-home-dark .rosa-home-hero h1 { color:#faf7ff; }
+.rosa-home-dark .rosa-home-hero p:not(.text-rose) { color: oklch(0.84 0.035 295); }
+.rosa-home-dark .rosa-home-hero .text-rose { color:#e5a8f6; }
+.rosa-home-dark .rosa-home-actions input {
+  color:#fff;
+  border-color:oklch(1 0 0 / 13%);
+  background:oklch(1 0 0 / 7%);
+}
+.rosa-home-dark .rosa-workspace-summary > div,
+.rosa-home-dark .rosa-summary-tile {
+  border-color:oklch(1 0 0 / 10%);
+  background:linear-gradient(145deg,oklch(1 0 0 / 8%),oklch(1 0 0 / 3%));
+  box-shadow:0 1px 0 oklch(1 0 0 / 7%) inset,0 16px 40px -34px #9b72ff;
+  backdrop-filter:blur(18px);
+}
+.rosa-home-dark .rosa-summary-copy strong { color:#fff; }
+.rosa-home-dark .rosa-summary-copy small,
+.rosa-home-dark .rosa-section-heading > span { color:oklch(0.77 0.04 292); }
+.rosa-home-dark .rosa-section-heading h2 { color:#faf7ff; }
+.rosa-home-dark .rosa-section-eyebrow { color:#c5a5ff; }
+.rosa-home-dark .rosa-note-glass {
+  background-color:oklch(0.25 0.045 285 / 82%);
+  background-image:
+    radial-gradient(circle at 88% 12%,oklch(0.62 0.16 300 / 20%),transparent 44%),
+    linear-gradient(145deg,oklch(1 0 0 / 9%),oklch(1 0 0 / 2%));
+  border-color:oklch(1 0 0 / 12%);
+  box-shadow:0 1px 0 oklch(1 0 0 / 10%) inset,0 18px 48px -32px oklch(0.62 0.2 295 / 62%);
+}
+.rosa-home-dark .rosa-card-title { color:#faf7ff; }
+.rosa-home-dark .rosa-card-description,
+.rosa-home-dark .rosa-card-meta { color:oklch(0.78 0.035 292); }
+.rosa-home-dark .rosa-card-emoji { background:oklch(1 0 0 / 9%); border-color:oklch(1 0 0 / 13%); }
+.rosa-home-dark .rosa-create-card {
+  color:#d8c5ff;
+  border-color:oklch(0.72 0.16 300 / 36%);
+  background:linear-gradient(145deg,oklch(0.36 0.09 292 / 42%),oklch(0.2 0.05 280 / 54%));
+  box-shadow:0 1px 0 oklch(1 0 0 / 9%) inset;
+}
+.rosa-agenda-panel {
+  position:relative;
+  overflow:hidden;
+  border-color:oklch(1 0 0 / 12%);
+  background:
+    radial-gradient(ellipse at 0% 0%,oklch(0.5 0.2 300 / 24%),transparent 48%),
+    radial-gradient(ellipse at 100% 100%,oklch(0.42 0.18 265 / 17%),transparent 45%),
+    linear-gradient(145deg,oklch(0.23 0.055 290 / 94%),oklch(0.14 0.04 275 / 96%));
+  box-shadow:0 1px 0 oklch(1 0 0 / 9%) inset,0 28px 70px -42px oklch(0.62 0.2 295 / 45%);
+  backdrop-filter:blur(24px) saturate(1.35);
+}
+.rosa-agenda-eyebrow {
+  color:#c8a8ff;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.19em;
+}
+.rosa-agenda-calendar,.rosa-agenda-day,.rosa-agenda-upcoming {
+  background:linear-gradient(145deg,oklch(1 0 0 / 6%),oklch(1 0 0 / 2%));
+  box-shadow:0 1px 0 oklch(1 0 0 / 5%) inset;
+  backdrop-filter:blur(14px);
+}
+.rosa-agenda-calendar [data-slot="calendar"] { color:#eee7ff; }
+.rosa-agenda-calendar .rdp-month_caption { color:#fff; }
+.rosa-agenda-calendar .rdp-weekday { color:oklch(0.75 0.05 292); }
+.rosa-agenda-calendar .rdp-day button { color:#e9e1ff; border-radius:.8rem; }
+.rosa-agenda-calendar .rdp-day button:hover { background:oklch(0.58 0.16 295 / 22%); }
+.rosa-agenda-calendar .rdp-day button[aria-selected="true"] { background:#8b5cf6; color:#fff; }
+.rosa-agenda-calendar .rosa-calendar-has-agenda button::after {
+  content:"";
+  position:absolute;
+  bottom:4px;
+  left:50%;
+  width:4px;
+  height:4px;
+  border-radius:50%;
+  transform:translateX(-50%);
+  background:#e879f9;
+  box-shadow:0 0 8px #e879f9;
+}
+.rosa-agenda-calendar .rdp-day button:focus-visible { outline:2px solid #c4b5fd; outline-offset:2px; }
+@media (max-width:640px) {
+  .rosa-home-dark::before { inset:4rem 0 4.4rem 0; }
+  .rosa-agenda-calendar { padding:.45rem; }
+  .rosa-agenda-calendar { --cell-size:2.25rem; }
+}
