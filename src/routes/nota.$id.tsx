@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Bold, Check, Code2, Eye, FileImage, Heading2, ImagePlus, Italic, Link2, List, ListOrdered, PenLine, Quote, Sparkles, Strikethrough, Trash2, Waypoints, Undo2, Redo2, Table } from "lucide-react";
+import { ArrowLeft, Bold, Check, Code2, Eye, FileImage, Heading2, ImagePlus, Italic, Link2, List, ListOrdered, PenLine, Quote, Sparkles, Strikethrough, Trash2, Waypoints, Undo2, Redo2, Table, SlidersHorizontal } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ClipboardEvent } from "react";
 
 import { AiAssistant } from "@/components/ai-assistant";
@@ -73,6 +73,11 @@ function NoteEditor({ note }: { note: Note }) {
   const state = useNotesState();
   const navigate = useNavigate();
   const [mode, setMode] = useState<"write" | "view">("write");
+  const [customizeOpen, setCustomizeOpen] = useState(false);
+  const style = note.style || { font: "serif" as const, size: 18, paper: "cream" as const };
+  const fontFamily = style.font === "sans" ? "Manrope, system-ui, sans-serif" : style.font === "mono" ? "ui-monospace, monospace" : "Literata, Georgia, serif";
+  const paperColors = { cream: "var(--paper)", lavender: "oklch(0.96 0.035 300)", blue: "oklch(0.96 0.035 245)", dark: "oklch(0.24 0.02 285)" };
+  const textColor = style.paper === "dark" ? "oklch(0.92 0.02 90)" : "var(--foreground)";
   const textRef = useRef<HTMLTextAreaElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const coverUploadRef = useRef<HTMLInputElement>(null);
@@ -187,6 +192,7 @@ function NoteEditor({ note }: { note: Note }) {
               <Check className="h-3.5 w-3.5" /> Salvo · {words} {words === 1 ? "palavra" : "palavras"}
             </span>
             <ColorPicker value={note.color} onChange={(color) => notesActions.update(note.id, { color })} />
+            <Button type="button" variant={customizeOpen ? "secondary" : "ghost"} size="sm" className="gap-1" onClick={() => setCustomizeOpen((v) => !v)}><SlidersHorizontal className="h-4 w-4" />Personalizar</Button>
             <div className="flex rounded-full border border-border bg-paper p-0.5">
               <ModeButton active={mode === "write"} onClick={() => setMode("write")} icon={PenLine} label="Escrever" />
               <ModeButton active={mode === "view"} onClick={() => setMode("view")} icon={Eye} label="Visualizar" />
@@ -221,7 +227,13 @@ function NoteEditor({ note }: { note: Note }) {
           </div>
         </div>
 
-        <article className="paper-ruled relative min-h-[75vh] overflow-hidden rounded-lg border border-border pb-16 pl-16 pr-6 pt-8 shadow-lift sm:pr-12">
+        {customizeOpen && <div className="mb-3 flex flex-wrap items-end gap-3 rounded-xl border border-primary/15 bg-paper/70 p-3 shadow-paper backdrop-blur-md">
+          <label className="flex flex-col gap-1 text-xs text-muted-foreground">Fonte<select value={style.font} onChange={(e) => notesActions.update(note.id, { style: { ...style, font: e.target.value as typeof style.font } })} className="h-9 rounded-md border border-border bg-background px-2 text-sm text-foreground"><option value="serif">Serifada (Literata)</option><option value="sans">Sem serifa (Manrope)</option><option value="mono">Monoespaçada</option></select></label>
+          <label className="flex flex-col gap-1 text-xs text-muted-foreground">Tamanho<select value={style.size} onChange={(e) => notesActions.update(note.id, { style: { ...style, size: Number(e.target.value) } })} className="h-9 rounded-md border border-border bg-background px-2 text-sm text-foreground"><option value={16}>Pequeno</option><option value={18}>Normal</option><option value={20}>Grande</option><option value={22}>Muito grande</option><option value={24}>Extra grande</option></select></label>
+          <label className="flex flex-col gap-1 text-xs text-muted-foreground">Papel<select value={style.paper} onChange={(e) => notesActions.update(note.id, { style: { ...style, paper: e.target.value as typeof style.paper } })} className="h-9 rounded-md border border-border bg-background px-2 text-sm text-foreground"><option value="cream">Creme</option><option value="lavender">Lavanda</option><option value="blue">Azul claro</option><option value="dark">Escuro</option></select></label>
+          <Button type="button" variant="ghost" size="sm" onClick={() => notesActions.update(note.id, { style: { font: "serif", size: 18, paper: "cream" } })}>Restaurar padrão</Button>
+        </div>}
+        <article style={{ backgroundColor: paperColors[style.paper], color: textColor }} className="paper-ruled relative min-h-[75vh] overflow-hidden rounded-lg border border-border pb-16 pl-16 pr-6 pt-8 shadow-lift sm:pr-12">
           <span className={cn("absolute inset-x-0 top-0 h-1.5", NOTE_COLOR_BG[note.color])} />
           <input
             value={note.title}
@@ -274,7 +286,7 @@ function NoteEditor({ note }: { note: Note }) {
                 onKeyDown={(e) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "b") { e.preventDefault(); insertAtCursor("**", "**"); } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "i") { e.preventDefault(); insertAtCursor("*", "*"); } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") { e.preventDefault(); insertLink(); } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") { e.preventDefault(); if (e.shiftKey) redoContent(); else undoContent(); } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "y") { e.preventDefault(); redoContent(); } }}
                 placeholder="Comece a escrever… (dica: use # para títulos, - para listas)"
                 aria-label="Conteúdo da página"
-                className="block min-h-[55vh] w-full resize-none overflow-hidden bg-transparent font-serif text-lg leading-8 text-foreground outline-none placeholder:text-muted-foreground/60"
+                style={{ fontFamily, fontSize: `${style.size}px`, color: textColor }} className="block min-h-[55vh] w-full resize-none overflow-hidden bg-transparent leading-8 outline-none placeholder:text-muted-foreground/60"
               />
               <div className="mt-2 flex flex-wrap items-center justify-between gap-2 border-t border-primary/10 pt-2 text-xs text-muted-foreground">
                 <span>{words} palavras · {characters} caracteres · leitura ~{readingMinutes} min</span>
@@ -282,7 +294,7 @@ function NoteEditor({ note }: { note: Note }) {
               </div>
               </>
             ) : note.content.trim() ? (
-              <MarkdownView source={note.content} className="text-lg" />
+              <MarkdownView source={note.content} className="leading-8" style={{ fontFamily, fontSize: `${style.size}px`, color: textColor }} />
             ) : (
               <p className="font-serif text-lg leading-8 text-muted-foreground">Página em branco.</p>
             )}
