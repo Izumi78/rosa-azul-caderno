@@ -1383,3 +1383,83 @@ body:has(.rosa-home-dark) .rosa-settings-panel button { color: #eee7ff; }
 @media (prefers-reduced-motion: reduce) {
   .rosa-mural-card { transition: none; }
 }
+
+
+/* Task board — Trello-inspired workflow in Rosa Azul glass style */
+.rosa-kanban-page {
+  position: relative;
+  isolation: isolate;
+}
+.rosa-kanban-page::before {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  inset: 4.5rem 0 0 5.25rem;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 14% 12%, oklch(0.62 0.16 295 / 19%), transparent 36%),
+    radial-gradient(ellipse at 88% 75%, oklch(0.55 0.15 250 / 14%), transparent 38%),
+    linear-gradient(145deg, #0b0917, #151027 52%, #090e1d);
+}
+.rosa-kanban-column {
+  border-color: oklch(1 0 0 / 13%);
+  background: linear-gradient(145deg, oklch(1 0 0 / 7%), transparent 40%), oklch(0.16 0.045 280 / 76%);
+  box-shadow: 0 1px 0 oklch(1 0 0 / 10%) inset, 0 20px 50px -36px oklch(0.68 0.17 295 / 45%);
+  backdrop-filter: blur(22px) saturate(1.35);
+}
+.rosa-kanban-column.is-drop-ready {
+  border-color: oklch(0.82 0.12 292 / 36%);
+}
+.rosa-kanban-card {
+  border-color: oklch(1 0 0 / 15%);
+  background:
+    linear-gradient(135deg, oklch(1 0 0 / 11%), transparent 48%),
+    linear-gradient(145deg, oklch(0.29 0.06 290 / 94%), oklch(0.17 0.04 275 / 96%));
+  box-shadow: 0 1px 0 oklch(1 0 0 / 15%) inset, 0 12px 28px -22px #05030d;
+  cursor: grab;
+}
+.rosa-kanban-card:active { cursor: grabbing; }
+.rosa-kanban-card:hover {
+  border-color: oklch(0.9 0.1 292 / 38%);
+  box-shadow: 0 1px 0 oklch(1 0 0 / 20%) inset, 0 18px 34px -24px oklch(0.7 0.17 295 / 55%);
+}
+.rosa-kanban-empty { background: oklch(0.12 0.035 280 / 24%); }
+
+/* Obsidian-like tab strip for switching between notes while editing */
+.rosa-note-switcher {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid oklch(1 0 0 / 13%);
+  border-radius: 1.1rem;
+  background:
+    linear-gradient(135deg, oklch(1 0 0 / 8%), transparent 55%),
+    linear-gradient(145deg, oklch(0.24 0.055 290 / 82%), oklch(0.14 0.04 275 / 90%));
+  box-shadow: 0 1px 0 oklch(1 0 0 / 12%) inset, 0 14px 34px -28px oklch(0.7 0.17 295 / 45%);
+  backdrop-filter: blur(22px) saturate(1.4);
+}
+.rosa-note-switcher-list {
+  scrollbar-width: thin;
+  scrollbar-color: oklch(0.64 0.12 292 / 45%) transparent;
+}
+.rosa-note-switcher-tab {
+  max-width: 13rem;
+  color: oklch(0.83 0.035 290);
+  border-color: oklch(1 0 0 / 9%);
+  background: oklch(1 0 0 / 3%);
+}
+.rosa-note-switcher-tab:hover {
+  color: white;
+  border-color: oklch(0.8 0.12 292 / 28%);
+  background: oklch(1 0 0 / 8%);
+}
+.rosa-note-switcher-tab.is-current {
+  color: white;
+  border-color: oklch(0.82 0.13 292 / 38%);
+  background: linear-gradient(145deg, oklch(0.62 0.15 292 / 28%), oklch(0.42 0.1 275 / 18%));
+  box-shadow: 0 1px 0 oklch(1 0 0 / 15%) inset, 0 6px 18px -14px oklch(0.8 0.16 292 / 65%);
+}
+@media (max-width: 640px) {
+  .rosa-kanban-page::before { inset: 4.5rem 0 4.5rem; }
+  .rosa-kanban-column { min-height: 260px; }
+}
