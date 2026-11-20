@@ -46,11 +46,6 @@ export function MarkdownView({ source, className, style }: { source: string; cla
           return defaultUrlTransform(url);
         }}
         components={{
-          a: ({ children, href }) => (
-            <a href={href} target="_blank" rel="noreferrer noopener">
-              {children}
-            </a>
-          ),
           img: ({ src, alt }) => {
             const embed = (alt?.toLowerCase().includes("vídeo") || alt?.toLowerCase().includes("video")) ? videoEmbedUrl(src) : null;
             if (embed) return <div className="my-5 aspect-video overflow-hidden rounded-xl border border-border bg-black shadow-sm"><iframe src={embed} title="Vídeo incorporado" className="h-full w-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen loading="lazy" referrerPolicy="strict-origin-when-cross-origin" /></div>;
