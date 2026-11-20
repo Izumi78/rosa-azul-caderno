@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { NoteColor } from "@/lib/notes-model";
 import { notesActions } from "@/lib/notes-store";
+import { compressImageForNotes } from "@/lib/image-utils";
 
 import { ColorPicker } from "./color-picker";
 
@@ -89,10 +90,10 @@ export function NewNoteDialog({ trigger }: { trigger?: ReactNode }) {
               <div className="flex gap-2">
                 <Input value={coverImage.startsWith("data:") ? "Foto carregada ✓" : coverImage} onChange={(e) => setCoverImage(e.target.value)} className="bg-background" placeholder="Cole URL de uma imagem" disabled={coverImage.startsWith("data:")} />
                 <Button type="button" variant="outline" onClick={() => coverInputRef.current?.click()}>Escolher</Button>
-                <input ref={coverInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => {
-                  const file = e.target.files?.[0]; if (!file) return;
-                  if (file.size > 300 * 1024) { window.alert("A imagem deve ter até 300 KB."); e.currentTarget.value = ""; return; }
-                  const reader = new FileReader(); reader.onload = () => setCoverImage(String(reader.result || "")); reader.readAsDataURL(file); e.currentTarget.value = "";
+                <input ref={coverInputRef} type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                  const file = e.target.files?.[0]; e.currentTarget.value = ""; if (!file) return;
+                  try { setCoverImage(await compressImageForNotes(file)); }
+                  catch (error) { window.alert(error instanceof Error ? error.message : "Não foi possível carregar a imagem."); }
                 }} />
               </div>
             </div>
