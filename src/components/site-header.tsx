@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { LayoutGrid, Waypoints, Settings2, Sun, Moon } from "lucide-react";
+import { LayoutGrid, Waypoints, CalendarDays, Settings2, Sun, Moon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Wordmark } from "./logo";
+import { ProfileAvatar } from "./profile-avatar";
 
 const itemClass = "rosa-rail-link group flex w-full flex-col items-center justify-center gap-1.5 rounded-2xl px-2 py-3 text-[10px] font-semibold tracking-wide text-muted-foreground transition-all hover:bg-accent/70 hover:text-foreground";
 export function SiteHeader() {
@@ -30,9 +31,11 @@ export function SiteHeader() {
       <aside className="rosa-sidebar fixed bottom-0 left-0 top-[4.5rem] z-30 flex w-[5.25rem] flex-col items-center gap-2 border-r border-border/70 px-2 py-5">
         <Link to="/" activeOptions={{ exact: true }} className={itemClass} activeProps={{ className: "is-active" }}><LayoutGrid className="h-5 w-5" />Blocos</Link>
         <Link to="/mural" className={itemClass} activeProps={{ className: "is-active" }}><Waypoints className="h-5 w-5" />Mural</Link>
+        <Link to="/calendario" className={itemClass} activeProps={{ className: "is-active" }}><CalendarDays className="h-5 w-5" />Calendário</Link>
         <div className="my-2 h-px w-8 bg-border" />
         <div className="flex-1" />
         <button type="button" className={itemClass} onClick={() => setSettingsOpen((v) => !v)} aria-expanded={settingsOpen}><Settings2 className="h-5 w-5" />Ajustes</button>
+        <ProfileAvatar />
       </aside>
       {settingsOpen && <div className="rosa-settings-panel fixed bottom-24 left-[5.75rem] z-50 w-64 rounded-2xl border border-border p-4 shadow-2xl">
         <div className="mb-3"><p className="text-sm font-semibold text-foreground">Preferências</p><p className="text-xs text-muted-foreground">Personalize seu espaço de escrita.</p></div>
