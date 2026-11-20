@@ -5,7 +5,8 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ClipboardEv
 import { AiAssistant } from "@/components/ai-assistant";
 import { ColorPicker } from "@/components/color-picker";
 import { LinksPanel } from "@/components/links-panel";
-import { MarkdownView } from "@/components/markdown-view";\nimport { VisualLayoutEditor } from "@/components/visual-layout-editor";
+import { MarkdownView } from "@/components/markdown-view";
+import { VisualLayoutEditor } from "@/components/visual-layout-editor";
 import { NOTE_COLOR_BG } from "@/components/note-colors";
 import {
   AlertDialog,
@@ -180,8 +181,11 @@ function NoteEditor({ note }: { note: Note }) {
     const cols = Math.min(6, Math.max(1, Number(rawCols) || 3));
     const header = "| " + Array.from({ length: cols }, (_, i) => "Coluna " + (i + 1)).join(" | ") + " |";
     const separator = "| " + Array.from({ length: cols }, () => "---").join(" | ") + " |";
-    const body = Array.from({ length: rows }, () => "| " + Array.from({ length: cols }, () => " ").join(" | ") + " |").join("\n");
-    insertAtCursor("", "", header + "\n" + separator + "\n" + body);
+    const body = Array.from({ length: rows }, () => "| " + Array.from({ length: cols }, () => " ").join(" | ") + " |").join("
+");
+    insertAtCursor("", "", header + "
+" + separator + "
+" + body);
   };
   const insertLink = () => {
     const url = window.prompt("Cole ou digite o endereço do link:");
@@ -190,7 +194,8 @@ function NoteEditor({ note }: { note: Note }) {
     insertAtCursor("[", "](" + url.trim() + ")", label);
   };
   const insertLinePrefix = (prefix: string) => {
-    const el = textRef.current, value = note.content, start = el?.selectionStart ?? value.length, lineStart = value.lastIndexOf("\n", Math.max(0, start - 1)) + 1;
+    const el = textRef.current, value = note.content, start = el?.selectionStart ?? value.length, lineStart = value.lastIndexOf("
+", Math.max(0, start - 1)) + 1;
     saveContent(value.slice(0, lineStart) + prefix + value.slice(lineStart));
     requestAnimationFrame(() => { if (el) { el.focus(); el.setSelectionRange(start + prefix.length, start + prefix.length); } });
   };
@@ -200,7 +205,11 @@ function NoteEditor({ note }: { note: Note }) {
       if (file.type.startsWith("image/")) {
         const compressed = await compressImageBlobForNotes(file);
         const reference = await saveMediaFile(new File([compressed], name, { type: compressed.type }));
-        saveContent(note.content + (note.content.endsWith("\n") ? "" : "\n\n") + "![" + name + "](" + reference + ")\n");
+        saveContent(note.content + (note.content.endsWith("
+") ? "" : "
+
+") + "![" + name + "](" + reference + ")
+");
         return;
       }
       if (file.type.startsWith("video/")) {
@@ -209,7 +218,11 @@ function NoteEditor({ note }: { note: Note }) {
           return;
         }
         const reference = await saveMediaFile(file);
-        saveContent(note.content + (note.content.endsWith("\n") ? "" : "\n\n") + "![Vídeo: " + name + "](" + reference + ")\n");
+        saveContent(note.content + (note.content.endsWith("
+") ? "" : "
+
+") + "![Vídeo: " + name + "](" + reference + ")
+");
         return;
       }
       if (file.size > 1024 * 1024) {
@@ -219,7 +232,11 @@ function NoteEditor({ note }: { note: Note }) {
       const reader = new FileReader();
       reader.onload = () => {
         const data = String(reader.result || "");
-        saveContent(note.content + (note.content.endsWith("\n") ? "" : "\n\n") + "[" + name + "](" + data + ")\n");
+        saveContent(note.content + (note.content.endsWith("
+") ? "" : "
+
+") + "[" + name + "](" + data + ")
+");
       };
       reader.readAsDataURL(file);
     } catch (error) {
@@ -234,7 +251,9 @@ function NoteEditor({ note }: { note: Note }) {
       const blob = await compressImageBlobForNotes(file);
       const reference = await saveMediaFile(new File([blob], file.name || "imagem-colada.webp", { type: blob.type }));
       const el = textRef.current, value = note.content, start = el?.selectionStart ?? value.length, end = el?.selectionEnd ?? value.length;
-      saveContent(value.slice(0, start) + "\n![Imagem colada](" + reference + ")\n" + value.slice(end));
+      saveContent(value.slice(0, start) + "
+![Imagem colada](" + reference + ")
+" + value.slice(end));
     } catch (error) {
       window.alert(error instanceof Error ? error.message : "Não foi possível colar esta imagem.");
     }
@@ -277,7 +296,8 @@ function NoteEditor({ note }: { note: Note }) {
             <Button type="button" variant="outline" size="sm" className="gap-1" onClick={() => setSidebarCollapsed((v) => !v)} title={sidebarCollapsed ? "Mostrar painel lateral" : "Recolher painel lateral"} aria-label={sidebarCollapsed ? "Mostrar painel lateral" : "Recolher painel lateral"}>{sidebarCollapsed ? <PanelRightOpen className="h-4 w-4" /> : <PanelRightClose className="h-4 w-4" />}{sidebarCollapsed ? "Painel" : "Recolher"}</Button>
             <div className="flex rounded-full border border-border bg-paper p-0.5">
               <ModeButton active={mode === "write"} onClick={() => setMode("write")} icon={PenLine} label="Escrever" />
-              <ModeButton active={mode === "layout"} onClick={() => setMode("layout")} icon={LayoutDashboard} label="Layout" />\n              <ModeButton active={mode === "view"} onClick={() => setMode("view")} icon={Eye} label="Prévia" />
+              <ModeButton active={mode === "layout"} onClick={() => setMode("layout")} icon={LayoutDashboard} label="Layout" />
+              <ModeButton active={mode === "view"} onClick={() => setMode("view")} icon={Eye} label="Prévia" />
             </div>
             <AlertDialog>
               <AlertDialogTrigger asChild>
@@ -355,7 +375,8 @@ function NoteEditor({ note }: { note: Note }) {
 <Button type="button" variant="ghost" size="icon" title="Lista numerada" aria-label="Lista numerada" onClick={() => insertLinePrefix("1. ")}><ListOrdered className="h-4 w-4" /></Button>
 <Button type="button" variant="ghost" size="icon" title="Checklist" aria-label="Checklist" onClick={() => insertLinePrefix("- [ ] ")}><Check className="h-4 w-4" /></Button>
 <Button type="button" variant="ghost" size="icon" title="Inserir link" aria-label="Inserir link" onClick={insertLink}><Link2 className="h-4 w-4" /></Button>
-<Button type="button" variant="ghost" size="icon" title="Separador" aria-label="Separador" onClick={() => insertLinePrefix("---\n")}><span className="text-xs font-bold">—</span></Button><Button type="button" variant="ghost" size="icon" title="Inserir tabela" aria-label="Inserir tabela" onClick={insertTable}><Table className="h-4 w-4" /></Button><Button type="button" variant="ghost" size="icon" title="Desfazer (Ctrl+Z)" aria-label="Desfazer" onClick={undoContent} disabled={undoStack.current.length === 0}><Undo2 className="h-4 w-4" /></Button><Button type="button" variant="ghost" size="icon" title="Refazer (Ctrl+Y)" aria-label="Refazer" onClick={redoContent} disabled={redoStack.current.length === 0}><Redo2 className="h-4 w-4" /></Button>
+<Button type="button" variant="ghost" size="icon" title="Separador" aria-label="Separador" onClick={() => insertLinePrefix("---
+")}><span className="text-xs font-bold">—</span></Button><Button type="button" variant="ghost" size="icon" title="Inserir tabela" aria-label="Inserir tabela" onClick={insertTable}><Table className="h-4 w-4" /></Button><Button type="button" variant="ghost" size="icon" title="Desfazer (Ctrl+Z)" aria-label="Desfazer" onClick={undoContent} disabled={undoStack.current.length === 0}><Undo2 className="h-4 w-4" /></Button><Button type="button" variant="ghost" size="icon" title="Refazer (Ctrl+Y)" aria-label="Refazer" onClick={redoContent} disabled={redoStack.current.length === 0}><Redo2 className="h-4 w-4" /></Button>
 <span className="mx-1 h-5 w-px bg-border" />
 <Button type="button" variant="ghost" size="sm" className="gap-1.5" title="Inserir imagem ou arquivo" onClick={() => fileRef.current?.click()}><FileImage className="h-4 w-4" />Imagem/Arquivo</Button>
 <input ref={fileRef} type="file" accept="image/*,video/mp4,video/webm,application/pdf,text/plain" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) addFileAttachment(file); e.currentTarget.value = ""; }} />
@@ -375,6 +396,8 @@ function NoteEditor({ note }: { note: Note }) {
                 <span>Atalhos: Ctrl+B negrito · Ctrl+I itálico · Ctrl+K link</span>
               </div>
               </>
+            ) : mode === "layout" ? (
+              <VisualLayoutEditor elements={note.layoutElements || []} onChange={(layoutElements) => notesActions.update(note.id, { layoutElements })} />
             ) : note.content.trim() ? (
               <MarkdownView source={note.content} className="leading-8" style={{ fontFamily, fontSize: `${style.size}px`, color: textColor }} />
             ) : (
