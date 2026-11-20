@@ -82,7 +82,7 @@ function Index() {
 
 
   return (
-    <div className="rosa-home mx-auto max-w-7xl px-4 pb-20 pt-8 sm:px-6">
+    <div className="rosa-home mx-auto max-w-[1440px] px-5 pb-20 pt-7 sm:px-8">
       <section className="rosa-home-hero flex flex-col items-center gap-5 text-center">
         <div className="max-w-3xl">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-rose">ROSA AZUL · ESPAÇO CRIATIVO</p>
@@ -126,7 +126,7 @@ function Index() {
         <div><p className="rosa-section-eyebrow">SUA BIBLIOTECA</p><h2>Seus blocos de ideias</h2></div>
         <span>{query ? `${filtered.length} resultado(s)` : "Atualizados recentemente"}</span>
       </div>
-      <section className="rosa-note-grid mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+      <section className="rosa-note-grid mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
         {!hydrated &&
           Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className="aspect-square rounded-2xl bg-secondary" />
