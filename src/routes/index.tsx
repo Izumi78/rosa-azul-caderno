@@ -48,24 +48,24 @@ function Index() {
 
   return (
     <div className="rosa-home mx-auto max-w-7xl px-4 pb-20 pt-8 sm:px-6">
-      <section className="rosa-home-hero flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-        <div className="max-w-xl">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-rose">Seu caderno</p>
+      <section className="rosa-home-hero flex flex-col items-center gap-5 text-center">
+        <div className="max-w-3xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-rose">ROSA AZUL · ESPAÇO CRIATIVO</p>
           <h1 className="mt-2 text-4xl font-semibold leading-tight text-foreground sm:text-5xl">
-            Ideias que <em className="text-primary">florescem</em> em páginas.
+            Um espaço para suas <em className="text-primary">ideias</em>.
           </h1>
           <p className="mt-3 text-muted-foreground">
-            Cada bloco guarda uma página inteira, seus links e uma conversa com a Íris.
+            Organize pensamentos, projetos e inspirações em pequenos espaços que se conectam.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="rosa-home-actions flex flex-wrap items-center justify-center gap-3">
           <div className="relative">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Buscar blocos"
-              className="h-11 w-56 rounded-full bg-paper pl-9"
+              className="h-11 w-64 rounded-full border-white/40 bg-white/35 pl-9 shadow-sm backdrop-blur-lg"
               aria-label="Buscar blocos"
             />
           </div>
@@ -73,10 +73,10 @@ function Index() {
         </div>
       </section>
 
-      <section className="rosa-note-grid mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <section className="rosa-note-grid mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {!hydrated &&
           Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="aspect-square rounded-lg bg-secondary" />
+            <Skeleton key={i} className="aspect-square rounded-2xl bg-secondary" />
           ))}
         {hydrated &&
           filtered.map((note, i) => (
@@ -87,7 +87,7 @@ function Index() {
             trigger={
               <button
                 type="button"
-                className="rosa-create-card flex min-h-[230px] animate-fade-up flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-border text-muted-foreground transition-colors hover:border-primary hover:bg-paper hover:text-primary"
+                className="rosa-create-card aspect-square flex animate-fade-up flex-col items-center justify-center gap-3 rounded-[1.4rem] border-2 border-dashed border-border text-muted-foreground transition-colors hover:border-primary hover:bg-paper hover:text-primary"
                 style={{ animationDelay: `${Math.min(filtered.length, 12) * 45}ms` }}
               >
                 <span className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary">
