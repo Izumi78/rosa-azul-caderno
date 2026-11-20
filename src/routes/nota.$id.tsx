@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Bold, Check, Code2, Eye, FileImage, Heading2, ImagePlus, Italic, Link2, List, ListOrdered, PenLine, Quote, Sparkles, Strikethrough, Trash2, Waypoints, Undo2, Redo2, Table } from "lucide-react";
+import { ArrowLeft, Bold, Check, Code2, Eye, FileImage, Heading2, ImagePlus, Italic, Link2, List, ListOrdered, PenLine, Quote, Sparkles, Strikethrough, Trash2, Waypoints, Undo2, Redo2, Table, Video } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ClipboardEvent } from "react";
 
 import { AiAssistant } from "@/components/ai-assistant";
@@ -145,6 +145,18 @@ function NoteEditor({ note }: { note: Note }) {
     const label = window.prompt("Texto que aparecerá no link:", url.trim()) || url.trim();
     insertAtCursor("[", "](" + url.trim() + ")", label);
   };
+  const insertVideo = () => {
+    const url = window.prompt("Cole o link do YouTube ou Vimeo:");
+    if (!url?.trim()) return;
+    try {
+      const parsed = new URL(url.trim());
+      if (!["youtube.com", "www.youtube.com", "m.youtube.com", "youtu.be", "vimeo.com", "www.vimeo.com"].includes(parsed.hostname)) {
+        window.alert("Use um link válido do YouTube ou Vimeo.");
+        return;
+      }
+    } catch { window.alert("Link inválido."); return; }
+    insertAtCursor("![Vídeo](", ")", url.trim());
+  };
   const insertLinePrefix = (prefix: string) => {
     const el = textRef.current, value = note.content, start = el?.selectionStart ?? value.length, lineStart = value.lastIndexOf("\n", Math.max(0, start - 1)) + 1;
     saveContent(value.slice(0, lineStart) + prefix + value.slice(lineStart));
@@ -261,6 +273,7 @@ function NoteEditor({ note }: { note: Note }) {
 <Button type="button" variant="ghost" size="icon" title="Lista numerada" aria-label="Lista numerada" onClick={() => insertLinePrefix("1. ")}><ListOrdered className="h-4 w-4" /></Button>
 <Button type="button" variant="ghost" size="icon" title="Checklist" aria-label="Checklist" onClick={() => insertLinePrefix("- [ ] ")}><Check className="h-4 w-4" /></Button>
 <Button type="button" variant="ghost" size="icon" title="Inserir link" aria-label="Inserir link" onClick={insertLink}><Link2 className="h-4 w-4" /></Button>
+<Button type="button" variant="ghost" size="icon" title="Incorporar vídeo do YouTube/Vimeo" aria-label="Inserir vídeo" onClick={insertVideo}><Video className="h-4 w-4" /></Button>
 <Button type="button" variant="ghost" size="icon" title="Separador" aria-label="Separador" onClick={() => insertLinePrefix("---\n")}><span className="text-xs font-bold">—</span></Button><Button type="button" variant="ghost" size="icon" title="Inserir tabela" aria-label="Inserir tabela" onClick={insertTable}><Table className="h-4 w-4" /></Button><Button type="button" variant="ghost" size="icon" title="Desfazer (Ctrl+Z)" aria-label="Desfazer" onClick={undoContent} disabled={undoStack.current.length === 0}><Undo2 className="h-4 w-4" /></Button><Button type="button" variant="ghost" size="icon" title="Refazer (Ctrl+Y)" aria-label="Refazer" onClick={redoContent} disabled={redoStack.current.length === 0}><Redo2 className="h-4 w-4" /></Button>
 <span className="mx-1 h-5 w-px bg-border" />
 <Button type="button" variant="ghost" size="sm" className="gap-1.5" title="Inserir imagem ou arquivo" onClick={() => fileRef.current?.click()}><FileImage className="h-4 w-4" />Imagem/Arquivo</Button>
