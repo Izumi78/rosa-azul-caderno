@@ -3,12 +3,12 @@ import { BookOpen, Download, Plus, Search, Upload, Waypoints } from "lucide-reac
 import { useMemo, useRef, useState } from "react";
 
 import { NewNoteDialog } from "@/components/new-note-dialog";
-import { HomeCalendar } from "@/components/home-calendar";
 import { NoteCard } from "@/components/note-card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { notesActions, useNotesState } from "@/lib/notes-store";
+import { Wordmark } from "@/components/logo";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -82,83 +82,45 @@ function Index() {
   };
 
 
+  if (!hydrated) {
+    return (
+      <div className="rosa-loading-screen" role="status" aria-live="polite">
+        <div className="rosa-loading-brand"><Wordmark /><span className="rosa-loading-orbit" /></div>
+        <p>Preparando seu espaço criativo</p>
+        <span className="rosa-loading-line"><i /></span>
+      </div>
+    );
+  }
+
   return (
     <div className="rosa-home rosa-home-dark mx-auto max-w-[1440px] px-5 pb-20 pt-7 sm:px-8">
-      <section className="rosa-home-hero flex flex-col items-center gap-5 text-center">
-        <div className="max-w-3xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-rose">ROSA AZUL · ESPAÇO CRIATIVO</p>
-          <h1 className="mt-2 text-4xl font-semibold leading-tight text-foreground sm:text-5xl">
-            Um espaço para suas <em className="text-primary">ideias</em>.
-          </h1>
-          <p className="mt-3 text-muted-foreground">
-            Organize pensamentos, projetos e inspirações em pequenos espaços que se conectam.
-          </p>
+      <section className="rosa-library-top">
+        <div className="rosa-section-heading">
+          <div><p className="rosa-section-eyebrow">ROSA AZUL · SUA BIBLIOTECA</p><h1>Seus blocos de ideias</h1><p className="mt-2 text-sm text-violet-100/60">Suas anotações, projetos e inspirações em um só lugar.</p></div>
+          <span>{query ? `${filtered.length} resultado(s)` : `${notes.length} bloco(s)`}</span>
         </div>
-        <div className="rosa-home-actions flex flex-wrap items-center justify-center gap-3">
+        <div className="rosa-home-actions mt-5 flex flex-wrap items-center gap-3">
           <div className="relative">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Buscar blocos"
-              className="h-11 w-64 rounded-full border-white/40 bg-white/35 pl-9 shadow-sm backdrop-blur-lg"
-              aria-label="Buscar blocos"
-            />
+            <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar blocos" className="h-11 w-64 rounded-full border-white/20 bg-white/10 pl-9 shadow-sm backdrop-blur-lg" aria-label="Buscar blocos" />
           </div>
-          <div className="flex items-center gap-2"><Button type="button" variant="outline" className="h-11 rounded-full border-white/40 bg-white/35 shadow-sm backdrop-blur-lg" onClick={() => exportBackup(notes, connections)} disabled={!hydrated} title="Baixar cópia de segurança de todas as notas e conexões"><Download className="h-4 w-4" /> Backup</Button><Button type="button" variant="outline" className="h-11 rounded-full border-white/40 bg-white/35 shadow-sm backdrop-blur-lg" onClick={() => importRef.current?.click()} disabled={!hydrated} title="Restaurar backup JSON"><Upload className="h-4 w-4" /> Restaurar</Button><input ref={importRef} type="file" accept=".json,application/json" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) void importBackup(file); e.currentTarget.value = ""; }} /><NewNoteDialog /></div>
+          <Button type="button" variant="outline" className="h-11 rounded-full border-white/20 bg-white/10 shadow-sm backdrop-blur-lg" onClick={() => exportBackup(notes, connections)} title="Baixar cópia de segurança de todas as notas e conexões"><Download className="h-4 w-4" /> Backup</Button>
+          <Button type="button" variant="outline" className="h-11 rounded-full border-white/20 bg-white/10 shadow-sm backdrop-blur-lg" onClick={() => importRef.current?.click()} title="Restaurar backup JSON"><Upload className="h-4 w-4" /> Restaurar</Button>
+          <input ref={importRef} type="file" accept=".json,application/json" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) void importBackup(file); e.currentTarget.value = ""; }} />
+          <NewNoteDialog />
         </div>
       </section>
 
-      <HomeCalendar />
-
-      <section className="rosa-workspace-summary mt-7 grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <div className="rosa-summary-tile">
-          <span className="rosa-summary-icon"><BookOpen className="h-4 w-4" /></span>
-          <span className="rosa-summary-copy"><strong>{notes.length}</strong><small>{notes.length === 1 ? "bloco criado" : "blocos criados"}</small></span>
-        </div>
-        <div className="rosa-summary-tile">
-          <span className="rosa-summary-icon"><Waypoints className="h-4 w-4" /></span>
-          <span className="rosa-summary-copy"><strong>{connections.length}</strong><small>{connections.length === 1 ? "conexão no mural" : "conexões no mural"}</small></span>
-        </div>
-        <div className="rosa-summary-tile col-span-2 sm:col-span-1">
-          <span className="rosa-summary-copy"><strong>{hydrated ? "Seu espaço está pronto" : "Preparando seu espaço"}</strong><small>Ideias, referências e projetos em um só lugar</small></span>
-        </div>
+      <section className="rosa-note-grid mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+        {filtered.map((note, i) => <NoteCard key={note.id} note={note} links={linkCount(note.id)} index={i} />)}
+        {!query && <NewNoteDialog trigger={<button type="button" className="rosa-create-card aspect-square flex animate-fade-up flex-col items-center justify-center gap-3 rounded-[1.4rem] border border-dashed border-primary/30 text-muted-foreground transition-colors hover:border-primary hover:bg-paper hover:text-primary" style={{ animationDelay: `${Math.min(filtered.length, 12) * 45}ms` }}><span className="flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/15 bg-paper/70 shadow-paper"><Plus className="h-6 w-6" /></span><span className="font-display text-lg">Criar novo bloco</span><span className="max-w-[13rem] text-center text-xs text-muted-foreground">Abra uma nova página para guardar uma ideia.</span></button>} />}
       </section>
-
-      <div className="rosa-section-heading mt-9">
-        <div><p className="rosa-section-eyebrow">SUA BIBLIOTECA</p><h2>Seus blocos de ideias</h2></div>
-        <span>{query ? `${filtered.length} resultado(s)` : "Atualizados recentemente"}</span>
-      </div>
-      <section className="rosa-note-grid mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
-        {!hydrated &&
-          Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="aspect-square rounded-2xl bg-secondary" />
-          ))}
-        {hydrated &&
-          filtered.map((note, i) => (
-            <NoteCard key={note.id} note={note} links={linkCount(note.id)} index={i} />
-          ))}
-        {hydrated && !query && (
-          <NewNoteDialog
-            trigger={
-              <button
-                type="button"
-                className="rosa-create-card aspect-square flex animate-fade-up flex-col items-center justify-center gap-3 rounded-[1.4rem] border border-dashed border-primary/30 text-muted-foreground transition-colors hover:border-primary hover:bg-paper hover:text-primary"
-                style={{ animationDelay: `${Math.min(filtered.length, 12) * 45}ms` }}
-              >
-                <span className="flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/15 bg-paper/70 shadow-paper">
-                  <Plus className="h-6 w-6" />
-                </span>
-                <span className="font-display text-lg">Criar novo bloco</span>
-                <span className="max-w-[13rem] text-center text-xs text-muted-foreground">Abra uma nova página para guardar uma ideia.</span>
-              </button>
-            }
-          />
-        )}
+      {query && filtered.length === 0 && <p className="mt-10 text-center text-muted-foreground">Nenhum bloco encontrado para “{query}”.</p>}
+      <section className="rosa-workspace-summary mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <div className="rosa-summary-tile"><span className="rosa-summary-icon"><BookOpen className="h-4 w-4" /></span><span className="rosa-summary-copy"><strong>{notes.length}</strong><small>{notes.length === 1 ? "bloco criado" : "blocos criados"}</small></span></div>
+        <div className="rosa-summary-tile"><span className="rosa-summary-icon"><Waypoints className="h-4 w-4" /></span><span className="rosa-summary-copy"><strong>{connections.length}</strong><small>{connections.length === 1 ? "conexão no mural" : "conexões no mural"}</small></span></div>
+        <div className="rosa-summary-tile col-span-2 sm:col-span-1"><span className="rosa-summary-copy"><strong>Seu espaço está pronto</strong><small>Ideias, referências e projetos em um só lugar</small></span></div>
       </section>
-      {hydrated && query && filtered.length === 0 && (
-        <p className="mt-10 text-center text-muted-foreground">Nenhum bloco encontrado para “{query}”.</p>
-      )}
     </div>
   );
 }
