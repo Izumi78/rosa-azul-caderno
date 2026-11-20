@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Bold, Check, Code2, Eye, FileImage, Heading2, Italic, Link2, List, Paperclip, PenLine, Quote, Sparkles, Trash2, Waypoints } from "lucide-react";
+import { ArrowLeft, Bold, Check, Code2, Eye, FileImage, Heading2, Italic, Link2, List, PenLine, Quote, Sparkles, Trash2, Waypoints } from "lucide-react";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { AiAssistant } from "@/components/ai-assistant";
@@ -199,7 +199,7 @@ function NoteEditor({ note }: { note: Note }) {
 <textarea
                 ref={textRef}
                 value={note.content}
-                onChange={(e) => notesActions.update(note.id, { content: e.target.value })
+                onChange={(e) => notesActions.update(note.id, { content: e.target.value })}
                 onPaste={handlePaste}
                 placeholder="Comece a escrever… (dica: use # para títulos, - para listas)"
                 aria-label="Conteúdo da página"
