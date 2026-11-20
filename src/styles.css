@@ -619,3 +619,165 @@
 @media (prefers-reduced-motion: reduce) {
   .rosa-editor-tools button { transition: none; }
 }
+
+
+/* Mural neural — ideias como uma rede viva de sinapses */
+.rosa-mural-page {
+  background: var(--background);
+}
+.rosa-mural-header {
+  position: relative;
+  z-index: 5;
+  border-color: color-mix(in oklab, var(--primary) 14%, var(--border));
+  background: color-mix(in oklab, var(--paper) 76%, transparent);
+  box-shadow: 0 1px 0 oklch(1 0 0 / 42%) inset, 0 12px 32px -28px color-mix(in oklab, var(--primary) 45%, transparent);
+  backdrop-filter: blur(22px) saturate(1.2);
+  -webkit-backdrop-filter: blur(22px) saturate(1.2);
+}
+.rosa-mural-header h1 {
+  letter-spacing: -.035em;
+}
+.rosa-mural-stage {
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse at 50% 46%, oklch(0.82 0.12 292 / 20%), transparent 38%),
+    radial-gradient(ellipse at 18% 18%, oklch(0.84 0.1 318 / 18%), transparent 36%),
+    radial-gradient(ellipse at 84% 78%, oklch(0.82 0.1 245 / 20%), transparent 40%),
+    linear-gradient(145deg, color-mix(in oklab, var(--background) 94%, var(--accent)), var(--background) 55%, color-mix(in oklab, var(--background) 92%, var(--primary)));
+}
+.rosa-mural-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: .52;
+  background-image:
+    radial-gradient(circle at 1px 1px, color-mix(in oklab, var(--primary) 38%, transparent) 1px, transparent 1.8px),
+    radial-gradient(ellipse at center, transparent 34%, color-mix(in oklab, var(--background) 22%, transparent) 100%);
+  background-size: 34px 34px, 100% 100%;
+}
+.rosa-mural-stage::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  width: min(62vw, 760px);
+  aspect-ratio: 1;
+  left: 50%;
+  top: 48%;
+  transform: translate(-50%, -50%);
+  border-radius: 48% 52% 58% 42% / 43% 46% 54% 57%;
+  border: 1px solid color-mix(in oklab, var(--primary) 12%, transparent);
+  box-shadow:
+    0 0 0 26px color-mix(in oklab, var(--accent) 5%, transparent),
+    0 0 0 68px color-mix(in oklab, var(--primary) 4%, transparent),
+    inset 0 0 90px color-mix(in oklab, var(--primary) 7%, transparent);
+  opacity: .72;
+  animation: neural-orbit 28s ease-in-out infinite alternate;
+}
+.rosa-mural-stage > div {
+  z-index: 1;
+}
+.rosa-synapse-svg {
+  z-index: 1;
+  overflow: visible;
+}
+.rosa-synapse-wire {
+  stroke-width: 2.6;
+  filter: drop-shadow(0 0 5px color-mix(in oklab, var(--primary) 52%, transparent));
+}
+.rosa-synapse-pulse {
+  stroke: color-mix(in oklab, white 82%, var(--accent));
+  stroke-width: 1.5;
+  stroke-dasharray: 2 17;
+  animation: synapse-flow 2.6s linear infinite;
+}
+.rosa-synapse-node {
+  stroke: color-mix(in oklab, white 88%, var(--accent));
+  stroke-width: 2;
+  filter: drop-shadow(0 0 7px currentColor) drop-shadow(0 0 15px color-mix(in oklab, var(--primary) 40%, transparent));
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.rosa-mural-card {
+  z-index: 2;
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in oklab, var(--accent) 32%, transparent), transparent 52%),
+    linear-gradient(145deg, color-mix(in oklab, var(--paper) 62%, white 10%), color-mix(in oklab, var(--paper) 42%, var(--accent) 12%));
+  border-color: color-mix(in oklab, var(--primary) 23%, oklch(1 0 0 / 38%));
+  box-shadow:
+    0 1px 0 oklch(1 0 0 / 56%) inset,
+    0 12px 28px -20px color-mix(in oklab, var(--primary) 48%, transparent),
+    0 3px 10px oklch(0.2 0.04 285 / 8%);
+  backdrop-filter: blur(22px) saturate(1.35);
+  -webkit-backdrop-filter: blur(22px) saturate(1.35);
+}
+.rosa-mural-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(135deg, oklch(1 0 0 / 32%), transparent 42%, color-mix(in oklab, var(--primary) 5%, transparent));
+  opacity: .85;
+}
+.rosa-mural-card:hover {
+  transform: translateY(-4px) scale(1.018);
+  border-color: color-mix(in oklab, var(--primary) 44%, var(--border));
+  box-shadow:
+    0 1px 0 oklch(1 0 0 / 65%) inset,
+    0 22px 42px -22px color-mix(in oklab, var(--primary) 56%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--primary) 10%, transparent);
+}
+.rosa-mural-card:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+}
+.rosa-mural-card > span:first-child {
+  width: 3px;
+  border-radius: 999px;
+  opacity: .85;
+  box-shadow: 0 0 14px currentColor;
+}
+.rosa-mural-card-gloss {
+  opacity: .72;
+}
+.dark .rosa-mural-stage {
+  background:
+    radial-gradient(ellipse at 50% 46%, oklch(0.46 0.13 292 / 25%), transparent 38%),
+    radial-gradient(ellipse at 18% 18%, oklch(0.42 0.1 318 / 18%), transparent 36%),
+    radial-gradient(ellipse at 84% 78%, oklch(0.4 0.1 245 / 20%), transparent 40%),
+    linear-gradient(145deg, oklch(0.19 0.025 285), oklch(0.22 0.035 285) 55%, oklch(0.18 0.03 255));
+}
+.dark .rosa-mural-card {
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in oklab, var(--accent) 34%, transparent), transparent 52%),
+    linear-gradient(145deg, oklch(0.29 0.035 285 / 94%), oklch(0.24 0.035 275 / 91%));
+  border-color: color-mix(in oklab, var(--primary) 28%, var(--border));
+  box-shadow: 0 1px 0 oklch(1 0 0 / 10%) inset, 0 16px 36px -22px oklch(0 0 0 / 72%);
+}
+.dark .rosa-mural-card:hover {
+  box-shadow: 0 1px 0 oklch(1 0 0 / 14%) inset, 0 22px 42px -22px color-mix(in oklab, var(--primary) 44%, transparent);
+}
+@keyframes neural-orbit {
+  from { transform: translate(-50%, -50%) rotate(-7deg) scale(.96); }
+  to { transform: translate(-50%, -50%) rotate(7deg) scale(1.04); }
+}
+@media (max-width: 640px) {
+  .rosa-mural-header {
+    padding: .85rem 1rem;
+  }
+  .rosa-mural-stage::after {
+    width: 88vw;
+    opacity: .38;
+  }
+  .rosa-mural-card {
+    border-radius: 1.1rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rosa-mural-stage::after { animation: none; }
+  .rosa-mural-card { transition: none; }
+}
