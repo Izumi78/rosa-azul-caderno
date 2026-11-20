@@ -534,3 +534,88 @@
   .rosa-summary-copy small { font-size: .64rem; }
   .rosa-section-heading { align-items: start; flex-direction: column; gap: .2rem; }
 }
+
+
+/* Editor refinement — focused writing surface */
+.paper-ruled {
+  border-radius: 1.35rem;
+  border-color: color-mix(in oklab, var(--primary) 16%, var(--border));
+  box-shadow:
+    0 1px 0 oklch(1 0 0 / 55%) inset,
+    0 18px 48px -32px color-mix(in oklab, var(--primary) 42%, transparent),
+    0 3px 10px oklch(0.25 0.04 285 / 7%);
+}
+.rosa-note-customize {
+  border-color: color-mix(in oklab, var(--primary) 16%, var(--border));
+  background: color-mix(in oklab, var(--paper) 64%, transparent);
+  backdrop-filter: blur(18px) saturate(1.15);
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+}
+.rosa-editor-tools {
+  position: sticky;
+  top: .75rem;
+  z-index: 20;
+  gap: .35rem;
+  padding: .55rem;
+  border-color: color-mix(in oklab, var(--primary) 18%, var(--border));
+  background: color-mix(in oklab, var(--paper) 78%, transparent);
+  box-shadow: 0 8px 26px -18px color-mix(in oklab, var(--primary) 48%, transparent), 0 1px 0 oklch(1 0 0 / 48%) inset;
+  backdrop-filter: blur(22px) saturate(1.25);
+  -webkit-backdrop-filter: blur(22px) saturate(1.25);
+}
+.rosa-editor-tools button {
+  border-radius: .7rem;
+  transition: background-color .18s ease, color .18s ease, transform .18s ease;
+}
+.rosa-editor-tools button:hover:not(:disabled) {
+  color: var(--primary);
+  background: color-mix(in oklab, var(--accent) 54%, transparent);
+  transform: translateY(-1px);
+}
+.rosa-editor-tools button:disabled {
+  opacity: .35;
+}
+.paper-ruled textarea {
+  min-height: 58vh;
+  caret-color: var(--primary);
+  line-height: 2rem;
+}
+.paper-ruled input[aria-label="Título do bloco"] {
+  letter-spacing: -.035em;
+  text-wrap: pretty;
+}
+.paper-ruled input[aria-label="Título do bloco"]:focus,
+.paper-ruled input[aria-label="Descrição do bloco"]:focus {
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklab, var(--primary) 28%, transparent);
+  text-underline-offset: .35rem;
+}
+@media (max-width: 640px) {
+  .paper-ruled {
+    border-radius: 1rem;
+    padding-left: 3.7rem;
+    padding-right: 1rem;
+    padding-top: 1.35rem;
+  }
+  .rosa-editor-tools {
+    top: .35rem;
+    gap: .15rem;
+    padding: .4rem;
+    border-radius: 1rem;
+  }
+  .rosa-editor-tools button {
+    width: 2.15rem;
+    height: 2.15rem;
+  }
+  .rosa-editor-tools button[title="Inserir imagem ou arquivo"] {
+    width: auto;
+    padding-inline: .55rem;
+  }
+  .paper-ruled textarea {
+    min-height: 52vh;
+    font-size: max(16px, 1em);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rosa-editor-tools button { transition: none; }
+}
