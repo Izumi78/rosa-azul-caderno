@@ -24,8 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { connectedNotes, type Note } from "@/lib/notes-model";
 import { notesActions, useNotesState } from "@/lib/notes-store";
-import { compressImageBlobForNotes, saveMediaFile } from "@/lib/image-utils";
-import { saveNoteMedia, noteMediaRef } from "@/lib/note-media-store";
+import { compressImageBlobForNotes, getMediaFile, getMediaId, saveMediaFile } from "@/lib/image-utils";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/nota/$id")({
@@ -119,9 +118,9 @@ function NoteEditor({ note }: { note: Note }) {
     }
   }, [note.content]);
 
-  // Migrate older Base64 attachments out of note text into IndexedDB automatically.
+  // Migrate legacy Base64 attachments into the same IndexedDB store used by uploads.
   useEffect(() => {
-    const legacyMedia = [...note.content.matchAll(/data:(?:image\\/(?:jpeg|png|gif|webp)|video\\/(?:mp4|webm|ogg)|application\\/pdf|text\\/plain);base64,[A-Za-z0-9+/=]+/g)].map((match) => match[0]);
+    const legacyMedia = [...note.content.matchAll(/data:(?:image\/(?:jpeg|png|gif|webp)|video\/(?:mp4|webm|ogg)|application\/pdf|text\/plain);base64,[A-Za-z0-9+/=]+/g)].map((match) => match[0]);
     if (legacyMedia.length === 0) return;
     let cancelled = false;
     void (async () => {
@@ -129,8 +128,8 @@ function NoteEditor({ note }: { note: Note }) {
       for (const dataUrl of [...new Set(legacyMedia)]) {
         try {
           const blob = await (await fetch(dataUrl)).blob();
-          const id = await saveNoteMedia(blob);
-          migrated = migrated.split(dataUrl).join(noteMediaRef(id));
+          const reference = await saveMediaFile(new File([blob], "anexo-migrado", { type: blob.type || "application/octet-stream" }));
+          migrated = migrated.split(dataUrl).join(reference);
         } catch {
           // Keep the original content intact if a legacy attachment cannot be migrated.
         }
@@ -139,6 +138,21 @@ function NoteEditor({ note }: { note: Note }) {
     })();
     return () => { cancelled = true; };
   }, [note.id, note.content]);
+
+  useEffect(() => {
+    if (!note.coverImage?.startsWith("data:image/")) return;
+    let cancelled = false;
+    void (async () => {
+      try {
+        const blob = await (await fetch(note.coverImage!)).blob();
+        const reference = await saveMediaFile(new File([blob], "foto-de-capa", { type: blob.type || "image/jpeg" }));
+        if (!cancelled) notesActions.update(note.id, { coverImage: reference });
+      } catch {
+        // Keep the existing cover if migration is not possible.
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [note.id, note.coverImage]);
 
   useLayoutEffect(() => {
     const el = textRef.current;
@@ -216,9 +230,8 @@ function NoteEditor({ note }: { note: Note }) {
     if (!file) return;
     event.preventDefault();
     try {
-      const blob = await (await fetch(await compressImageForNotes(file))).blob();
-      const mediaId = await saveNoteMedia(blob);
-      const reference = noteMediaRef(mediaId);
+      const blob = await compressImageBlobForNotes(file);
+      const reference = await saveMediaFile(new File([blob], file.name || "imagem-colada.webp", { type: blob.type }));
       const el = textRef.current, value = note.content, start = el?.selectionStart ?? value.length, end = el?.selectionEnd ?? value.length;
       saveContent(value.slice(0, start) + "\n![Imagem colada](" + reference + ")\n" + value.slice(end));
     } catch (error) {
@@ -316,7 +329,7 @@ function NoteEditor({ note }: { note: Note }) {
             </label>
             <input value={note.coverImage?.startsWith("data:") ? "Imagem carregada ✓" : note.coverImage || ""} onChange={(e) => notesActions.update(note.id, { coverImage: e.target.value })} disabled={note.coverImage?.startsWith("data:")} placeholder="URL da foto de capa" aria-label="URL da foto de capa" className="h-9 min-w-[140px] flex-1 rounded-lg border border-border bg-paper/70 px-3 text-xs outline-none focus:ring-2 focus:ring-ring" />
             <Button type="button" variant="outline" size="sm" className="h-9 bg-paper/60" onClick={() => coverUploadRef.current?.click()}><ImagePlus className="h-4 w-4" />Foto</Button>
-            <input ref={coverUploadRef} type="file" accept="image/*" className="hidden" onChange={async (e) => { const file = e.target.files?.[0]; e.currentTarget.value = ""; if (!file) return; try { notesActions.update(note.id, { coverImage: await compressImageForNotes(file) }); } catch (error) { window.alert(error instanceof Error ? error.message : "Não foi possível carregar a foto."); } }} />
+            <input ref={coverUploadRef} type="file" accept="image/*" className="hidden" onChange={async (e) => { const file = e.target.files?.[0]; e.currentTarget.value = ""; if (!file) return; try { const blob = await compressImageBlobForNotes(file); const reference = await saveMediaFile(new File([blob], file.name || "foto-de-capa.webp", { type: blob.type })); notesActions.update(note.id, { coverImage: reference }); } catch (error) { window.alert(error instanceof Error ? error.message : "Não foi possível carregar a foto."); } }} />
             {note.coverImage && <Button type="button" variant="ghost" size="sm" className="h-9 text-muted-foreground" onClick={() => notesActions.update(note.id, { coverImage: "" })}>Remover foto</Button>}
           </div>
 <input
@@ -343,7 +356,7 @@ function NoteEditor({ note }: { note: Note }) {
 <Button type="button" variant="ghost" size="icon" title="Separador" aria-label="Separador" onClick={() => insertLinePrefix("---\n")}><span className="text-xs font-bold">—</span></Button><Button type="button" variant="ghost" size="icon" title="Inserir tabela" aria-label="Inserir tabela" onClick={insertTable}><Table className="h-4 w-4" /></Button><Button type="button" variant="ghost" size="icon" title="Desfazer (Ctrl+Z)" aria-label="Desfazer" onClick={undoContent} disabled={undoStack.current.length === 0}><Undo2 className="h-4 w-4" /></Button><Button type="button" variant="ghost" size="icon" title="Refazer (Ctrl+Y)" aria-label="Refazer" onClick={redoContent} disabled={redoStack.current.length === 0}><Redo2 className="h-4 w-4" /></Button>
 <span className="mx-1 h-5 w-px bg-border" />
 <Button type="button" variant="ghost" size="sm" className="gap-1.5" title="Inserir imagem ou arquivo" onClick={() => fileRef.current?.click()}><FileImage className="h-4 w-4" />Imagem/Arquivo</Button>
-<input ref={fileRef} type="file" accept="image/*,video/mp4,video/webm,video/ogg,video/quicktime,application/pdf,text/plain" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) addFileAttachment(file); e.currentTarget.value = ""; }} />
+<input ref={fileRef} type="file" accept="image/*,video/mp4,video/webm,application/pdf,text/plain" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) addFileAttachment(file); e.currentTarget.value = ""; }} />
 </div>
 <textarea
                 ref={textRef}
