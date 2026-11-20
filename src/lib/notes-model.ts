@@ -20,6 +20,8 @@ export interface Note {
   description: string;
   content: string;
   color: NoteColor;
+  emoji?: string;
+  coverImage?: string;
   links: NoteLink[];
   chat: ChatMessage[];
   position: { x: number; y: number };
@@ -61,7 +63,7 @@ export function nextBoardPosition(taken: { x: number; y: number }[]): { x: numbe
 
 export function addNote(
   data: NotesData,
-  input: { title: string; description: string; color?: NoteColor },
+  input: { title: string; description: string; color?: NoteColor; emoji?: string; coverImage?: string },
   now = Date.now(),
 ): { data: NotesData; note: Note } {
   const note: Note = {
@@ -70,6 +72,8 @@ export function addNote(
     description: input.description.trim(),
     content: "",
     color: input.color ?? "roxo",
+    emoji: input.emoji || "🌷",
+    coverImage: input.coverImage || "",
     links: [],
     chat: [],
     position: nextBoardPosition(data.notes.map((n) => n.position)),
