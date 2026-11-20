@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type PointerEvent } from "react";
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { ImagePlus, Plus, Trash2, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getMediaFile, getMediaId, saveMediaFile, compressImageBlobForNotes } from "@/lib/image-utils";
@@ -49,6 +49,8 @@ export function VisualLayoutEditor({ elements = [], onChange }: { elements?: Vis
   const upload = async (file?: File) => {
     if (!file) return;
     try {
+      if (actionRef.current === "image" && !file.type.startsWith("image/")) { window.alert("Selecione uma imagem para adicionar uma foto."); return; }
+      if (actionRef.current === "video" && !["video/mp4", "video/webm"].includes(file.type)) { window.alert("Selecione um vídeo MP4 ou WebM."); return; }
       let prepared = file;
       if (file.type.startsWith("image/")) {
         const compressed = await compressImageBlobForNotes(file);
@@ -64,14 +66,14 @@ export function VisualLayoutEditor({ elements = [], onChange }: { elements?: Vis
       setSelected(id);
     } catch (error) { window.alert(error instanceof Error ? error.message : "Não foi possível adicionar mídia."); }
   };
-  const startDrag = (event: PointerEvent, element: VisualElement, resize = false) => {
+  const startDrag = (event: ReactPointerEvent, element: VisualElement, resize = false) => {
     if ((event.target as HTMLElement).closest("textarea") || (event.target as HTMLElement).closest("video")) return;
     event.preventDefault();
     event.stopPropagation();
     const startX = event.clientX, startY = event.clientY;
     const initial = { x: element.x, y: element.y, width: element.width, height: element.height };
     (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
-    const move = (e: PointerEvent) => {
+    const move = (e: globalThis.PointerEvent) => {
       const scale = canvasRef.current?.getBoundingClientRect().width ? canvasRef.current!.getBoundingClientRect().width / 1000 : 1;
       const dx = (e.clientX - startX) / scale, dy = (e.clientY - startY) / scale;
       updateElement(element.id, resize ? { width: Math.max(140, initial.width + dx), height: Math.max(100, initial.height + dy) } : { x: Math.max(0, initial.x + dx), y: Math.max(0, initial.y + dy) });
@@ -88,13 +90,15 @@ export function VisualLayoutEditor({ elements = [], onChange }: { elements?: Vis
       <span className="ml-auto text-xs text-muted-foreground">Arraste para mover · canto para redimensionar</span>
       <input ref={fileRef} type="file" accept="image/*,video/mp4,video/webm" className="hidden" onChange={(e) => { void upload(e.target.files?.[0]); e.currentTarget.value = ""; }} />
     </div>
-    <div ref={canvasRef} onPointerDown={() => setSelected(null)} className="relative min-h-[780px] overflow-auto rounded-xl border border-violet-300/30 bg-white/60 shadow-inner" style={{ backgroundImage: "linear-gradient(rgba(120,90,160,.09) 1px, transparent 1px), linear-gradient(90deg, rgba(120,90,160,.09) 1px, transparent 1px)", backgroundSize: "24px 24px" }}>
+    <div className="max-w-full overflow-x-auto rounded-xl">
+    <div ref={canvasRef} onPointerDown={() => setSelected(null)} className="relative min-h-[780px] min-w-[1000px] overflow-hidden rounded-xl border border-violet-300/30 bg-white/60 shadow-inner" style={{ backgroundImage: "linear-gradient(rgba(120,90,160,.09) 1px, transparent 1px), linear-gradient(90deg, rgba(120,90,160,.09) 1px, transparent 1px)", backgroundSize: "24px 24px" }}>
       {elements.length === 0 && <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-center text-muted-foreground"><div><p className="text-lg font-medium">Seu espaço visual está vazio</p><p className="mt-1 text-sm">Adicione texto, fotos ou vídeos e organize como quiser.</p></div></div>}
       {elements.map((element) => <div key={element.id} onPointerDown={(e) => { e.stopPropagation(); setSelected(element.id); }} className={`absolute rounded-xl border bg-white/80 p-2 shadow-lg backdrop-blur-sm ${selected === element.id ? "border-violet-500 ring-2 ring-violet-400/40" : "border-violet-200/70"}`} style={{ left: element.x, top: element.y, width: element.width, height: element.height, touchAction: "none" }}>
         <div onPointerDown={(e) => { e.stopPropagation(); setSelected(element.id); startDrag(e, element); }} className="absolute left-2 right-8 top-1 z-10 h-2 cursor-grab rounded-full bg-violet-300/70 active:cursor-grabbing" aria-label="Mover elemento" />
         {element.type === "text" ? <textarea value={element.content} onChange={(e) => updateElement(element.id, { content: e.target.value })} onPointerDown={(e) => { e.stopPropagation(); setSelected(element.id); }} placeholder="Digite seu texto…" className="h-full w-full resize-none rounded-md bg-transparent p-2 text-sm leading-6 text-slate-800 outline-none" /> : <MediaPreview reference={element.content} />}
         <button type="button" aria-label="Redimensionar bloco" onPointerDown={(e) => { e.stopPropagation(); startDrag(e, element, true); }} className="absolute -bottom-2 -right-2 h-5 w-5 cursor-nwse-resize rounded-full border-2 border-violet-500 bg-white shadow" />
       </div>)}
+    </div>
     </div>
     <p className="text-xs text-muted-foreground">Elementos ficam salvos automaticamente nesta nota, neste navegador. O conteúdo Markdown original continua intacto.</p>
   </div>;
