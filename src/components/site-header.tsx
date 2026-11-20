@@ -21,13 +21,13 @@ export function SiteHeader() {
         <span className="absolute right-5 hidden items-center gap-2 text-[10px] font-semibold uppercase tracking-[.18em] text-muted-foreground sm:flex"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_10px_2px_oklch(0.75_0.16_150_/_45%)]" /> seu espaço criativo</span>
       </header>
       <aside className="rosa-sidebar fixed bottom-0 left-0 top-[4.5rem] z-30 flex w-[5.25rem] flex-col items-center gap-2 border-r border-border/70 px-2 py-5">
-        <Link to="/" activeOptions={{ exact: true }} className={itemClass} activeProps={{ className: "is-active" }}><LayoutGrid className="h-5 w-5" />Blocos</Link>
-        <Link to="/mural" className={itemClass} activeProps={{ className: "is-active" }}><Waypoints className="h-5 w-5" />Mural</Link>
-        <Link to="/tarefas" className={itemClass} activeProps={{ className: "is-active" }}><Columns3 className="h-5 w-5" />Tarefas</Link>
-        <Link to="/calendario" className={itemClass} activeProps={{ className: "is-active" }}><CalendarDays className="h-5 w-5" />Calendário</Link>
+        <Link to="/" activeOptions={{ exact: true }} className={itemClass} activeProps={{ className: "is-active" }}><span className="rosa-rail-icon"><LayoutGrid className="h-5 w-5" /></span><span className="rosa-rail-label">Blocos</span></Link>
+        <Link to="/mural" className={itemClass} activeProps={{ className: "is-active" }}><span className="rosa-rail-icon"><Waypoints className="h-5 w-5" /></span><span className="rosa-rail-label">Mural</span></Link>
+        <Link to="/tarefas" className={itemClass} activeProps={{ className: "is-active" }}><span className="rosa-rail-icon"><Columns3 className="h-5 w-5" /></span><span className="rosa-rail-label">Tarefas</span></Link>
+        <Link to="/calendario" className={itemClass} activeProps={{ className: "is-active" }}><span className="rosa-rail-icon"><CalendarDays className="h-5 w-5" /></span><span className="rosa-rail-label">Calendário</span></Link>
         <div className="my-2 h-px w-8 bg-border" />
         <div className="flex-1" />
-        <button type="button" className={itemClass} onClick={() => setSettingsOpen((v) => !v)} aria-expanded={settingsOpen}><Settings2 className="h-5 w-5" />Ajustes</button>
+        <button type="button" className={itemClass} onClick={() => setSettingsOpen((v) => !v)} aria-expanded={settingsOpen}><span className="rosa-rail-icon"><Settings2 className="h-5 w-5" /></span><span className="rosa-rail-label">Ajustes</span></button>
       </aside>
       {settingsOpen && <div className="rosa-settings-panel fixed bottom-24 left-[5.75rem] z-50 w-64 rounded-2xl border border-border p-4 shadow-2xl">
         <div className="mb-3"><p className="text-sm font-semibold text-foreground">Preferências</p><p className="text-xs text-muted-foreground">Seu espaço permanece no modo escuro.</p></div>
