@@ -1343,3 +1343,43 @@ body:has(.rosa-home-dark) .rosa-settings-panel button { color: #eee7ff; }
 .rosa-profile-topbar { width: auto; max-width: 12rem; }
 .rosa-profile-photo { border: 1px solid oklch(1 0 0 / 58%); box-shadow: 0 0 0 2px oklch(0.68 0.15 292 / 30%), 0 4px 16px oklch(0.05 0.03 280 / 45%); }
 @media (max-width: 420px) { .rosa-profile-topbar { gap: .4rem; padding-inline: .35rem; } .rosa-profile-topbar .rosa-profile-photo { height: 2rem; width: 2rem; } .rosa-profile-topbar small { display: none; } }
+
+
+/* Infinite neural workspace: pan the background, zoom with the wheel */
+.rosa-mural-stage {
+  overflow: hidden !important;
+  position: relative;
+  touch-action: none;
+  cursor: grab;
+  background-color: #0b0916;
+  background-image:
+    radial-gradient(ellipse at 50% 48%, oklch(0.34 0.12 292 / 18%), transparent 56%),
+    radial-gradient(circle, oklch(0.88 0.1 292 / 17%) 1px, transparent 1.3px),
+    linear-gradient(145deg, #0b0916, #111027 58%, #090e1d);
+  background-size: auto, 28px 28px, auto;
+}
+.rosa-mural-stage:active { cursor: grabbing; }
+.rosa-mural-stage > div {
+  will-change: transform;
+}
+.rosa-mural-card {
+  min-width: 0;
+  border-color: oklch(0.94 0.055 292 / 24%);
+  background:
+    linear-gradient(140deg, oklch(1 0 0 / 14%), transparent 48%, oklch(0.72 0.13 292 / 10%)),
+    linear-gradient(145deg, oklch(0.31 0.065 290 / 94%), oklch(0.17 0.045 275 / 96%));
+  box-shadow:
+    0 1px 0 oklch(1 0 0 / 19%) inset,
+    0 12px 34px -22px oklch(0.72 0.18 295 / 60%),
+    0 4px 12px oklch(0.05 0.025 280 / 35%);
+  backdrop-filter: blur(22px) saturate(1.5);
+  -webkit-backdrop-filter: blur(22px) saturate(1.5);
+}
+.rosa-mural-card:hover {
+  border-color: oklch(0.95 0.1 292 / 48%);
+  box-shadow: 0 1px 0 oklch(1 0 0 / 25%) inset, 0 18px 42px -22px oklch(0.72 0.18 295 / 75%);
+}
+.rosa-synapse-svg { overflow: visible; }
+@media (prefers-reduced-motion: reduce) {
+  .rosa-mural-card { transition: none; }
+}
