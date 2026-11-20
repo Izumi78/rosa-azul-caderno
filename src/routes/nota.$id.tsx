@@ -216,7 +216,7 @@ function NoteEditor({ note }: { note: Note }) {
 <Button type="button" variant="ghost" size="icon" title="Lista numerada" aria-label="Lista numerada" onClick={() => insertLinePrefix("1. ")}><ListOrdered className="h-4 w-4" /></Button>
 <Button type="button" variant="ghost" size="icon" title="Checklist" aria-label="Checklist" onClick={() => insertLinePrefix("- [ ] ")}><Check className="h-4 w-4" /></Button>
 <Button type="button" variant="ghost" size="icon" title="Inserir link" aria-label="Inserir link" onClick={insertLink}><Link2 className="h-4 w-4" /></Button>
-<Button type="button" variant="ghost" size="icon" title="Separador" aria-label="Separador" onClick={() => insertLinePrefix("---\\n")}><span className="text-xs font-bold">—</span></Button>
+<Button type="button" variant="ghost" size="icon" title="Separador" aria-label="Separador" onClick={() => insertLinePrefix("---\n")}><span className="text-xs font-bold">—</span></Button>
 <span className="mx-1 h-5 w-px bg-border" />
 <Button type="button" variant="ghost" size="sm" className="gap-1.5" title="Inserir imagem ou arquivo" onClick={() => fileRef.current?.click()}><FileImage className="h-4 w-4" />Imagem/Arquivo</Button>
 <input ref={fileRef} type="file" accept="image/*,application/pdf,text/plain" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) addFileAttachment(file); e.currentTarget.value = ""; }} />
