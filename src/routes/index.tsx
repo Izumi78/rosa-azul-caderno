@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Plus, Search } from "lucide-react";
+import { Download, Plus, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { NewNoteDialog } from "@/components/new-note-dialog";
 import { NoteCard } from "@/components/note-card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 import { useNotesState } from "@/lib/notes-store";
 
 export const Route = createFileRoute("/")({
@@ -27,6 +28,23 @@ export const Route = createFileRoute("/")({
   }),
   component: Index,
 });
+
+function exportBackup(notes: ReturnType<typeof useNotesState>["notes"], connections: ReturnType<typeof useNotesState>["connections"]) {
+  const backup = {
+    app: "Rosa Azul",
+    formatVersion: 1,
+    exportedAt: new Date().toISOString(),
+    notes,
+    connections,
+  };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `rosa-azul-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  link.click();
+  URL.revokeObjectURL(url);
+}
 
 function Index() {
   const { notes, connections, hydrated } = useNotesState();
@@ -69,7 +87,7 @@ function Index() {
               aria-label="Buscar blocos"
             />
           </div>
-          <NewNoteDialog />
+          <div className="flex items-center gap-2"><Button type="button" variant="outline" className="h-11 rounded-full border-white/40 bg-white/35 shadow-sm backdrop-blur-lg" onClick={() => exportBackup(notes, connections)} disabled={!hydrated} title="Baixar cópia de segurança de todas as notas e conexões"><Download className="h-4 w-4" /> Backup</Button><NewNoteDialog /></div>
         </div>
       </section>
 
