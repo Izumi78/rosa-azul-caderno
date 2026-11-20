@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { LayoutGrid, Waypoints, CalendarDays, Settings2, Sun, Moon } from "lucide-react";
+import { LayoutGrid, Waypoints, CalendarDays, Settings2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Wordmark } from "./logo";
 import { ProfileAvatar } from "./profile-avatar";
@@ -7,19 +7,10 @@ import { ProfileAvatar } from "./profile-avatar";
 const itemClass = "rosa-rail-link group flex w-full flex-col items-center justify-center gap-1.5 rounded-2xl px-2 py-3 text-[10px] font-semibold tracking-wide text-muted-foreground transition-all hover:bg-accent/70 hover:text-foreground";
 export function SiteHeader() {
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [dark, setDark] = useState(false);
   useEffect(() => {
-    const saved = localStorage.getItem("rosa-azul-theme");
-    const enabled = saved === "dark";
-    setDark(enabled);
-    document.documentElement.classList.toggle("dark", enabled);
+    document.documentElement.classList.add("dark");
+    localStorage.setItem("rosa-azul-theme", "dark");
   }, []);
-  const toggleTheme = () => {
-    const next = !dark;
-    setDark(next);
-    document.documentElement.classList.toggle("dark", next);
-    localStorage.setItem("rosa-azul-theme", next ? "dark" : "light");
-  };
   return (
     <>
       <header className="rosa-topbar sticky top-0 z-40 flex h-[4.5rem] items-center justify-center border-b border-border/70 px-4">
@@ -38,9 +29,8 @@ export function SiteHeader() {
         <button type="button" className={itemClass} onClick={() => setSettingsOpen((v) => !v)} aria-expanded={settingsOpen}><Settings2 className="h-5 w-5" />Ajustes</button>
       </aside>
       {settingsOpen && <div className="rosa-settings-panel fixed bottom-24 left-[5.75rem] z-50 w-64 rounded-2xl border border-border p-4 shadow-2xl">
-        <div className="mb-3"><p className="text-sm font-semibold text-foreground">Preferências</p><p className="text-xs text-muted-foreground">Personalize seu espaço de escrita.</p></div>
-        <button type="button" onClick={toggleTheme} className="flex w-full items-center justify-between rounded-xl border border-border bg-background/70 px-3 py-3 text-sm text-foreground hover:bg-accent"><span className="flex items-center gap-2">{dark ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}{dark ? "Tema escuro" : "Tema claro"}</span><span className="text-xs text-muted-foreground">Alternar</span></button>
-        <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">Mais opções de aparência e organização podem ser adicionadas aqui.</p>
+        <div className="mb-3"><p className="text-sm font-semibold text-foreground">Preferências</p><p className="text-xs text-muted-foreground">Seu espaço permanece no modo escuro.</p></div>
+        <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">As preferências de organização ficam disponíveis neste painel.</p>
       </div>}
     </>
   );
