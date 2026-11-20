@@ -1,6 +1,6 @@
 import { useNavigate } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useRef, useState, type FormEvent, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -25,14 +25,19 @@ export function NewNoteDialog({ trigger }: { trigger?: ReactNode }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [color, setColor] = useState<NoteColor>("roxo");
+  const [emoji, setEmoji] = useState("🌷");
+  const [coverImage, setCoverImage] = useState("");
+  const coverInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
   function submit(e: FormEvent) {
     e.preventDefault();
-    const note = notesActions.create({ title, description, color });
+    const note = notesActions.create({ title, description, color, emoji: emoji.trim() || "🌷", coverImage });
     setOpen(false);
     setTitle("");
     setDescription("");
+    setEmoji("🌷");
+    setCoverImage("");
     void navigate({ to: "/nota/$id", params: { id: note.id } });
   }
 
@@ -73,6 +78,24 @@ export function NewNoteDialog({ trigger }: { trigger?: ReactNode }) {
               rows={3}
               maxLength={300}
             />
+          </div>
+          <div className="grid grid-cols-[90px_minmax(0,1fr)] gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="note-emoji">Emoji</Label>
+              <Input id="note-emoji" value={emoji} onChange={(e) => setEmoji(e.target.value)} maxLength={8} className="bg-background text-center text-xl" placeholder="🌷" />
+            </div>
+            <div className="space-y-2">
+              <Label>Foto de capa (opcional)</Label>
+              <div className="flex gap-2">
+                <Input value={coverImage.startsWith("data:") ? "Foto carregada ✓" : coverImage} onChange={(e) => setCoverImage(e.target.value)} className="bg-background" placeholder="Cole URL de uma imagem" disabled={coverImage.startsWith("data:")} />
+                <Button type="button" variant="outline" onClick={() => coverInputRef.current?.click()}>Escolher</Button>
+                <input ref={coverInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => {
+                  const file = e.target.files?.[0]; if (!file) return;
+                  if (file.size > 300 * 1024) { window.alert("A imagem deve ter até 300 KB."); e.currentTarget.value = ""; return; }
+                  const reader = new FileReader(); reader.onload = () => setCoverImage(String(reader.result || "")); reader.readAsDataURL(file); e.currentTarget.value = "";
+                }} />
+              </div>
+            </div>
           </div>
           <div className="space-y-2">
             <Label>Cor</Label>
