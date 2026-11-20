@@ -41,7 +41,7 @@ export function MarkdownView({ source, className, style }: { source: string; cla
         remarkPlugins={[remarkGfm, remarkBreaks]}
         urlTransform={(url, key) => {
           const safeData =
-            /^data:(image\/(?:jpeg|png|gif|webp)|application\/pdf|text\/plain);base64,[A-Za-z0-9+/=]+$/.test(url);
+            /^data:(image\/(?:jpeg|png|gif|webp)|video\/(?:mp4|webm)|application\/pdf|text\/plain);base64,[A-Za-z0-9+/=]+$/.test(url);
           if (safeData && (key === "src" || key === "href")) return url;
           return defaultUrlTransform(url);
         }}
