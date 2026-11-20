@@ -1558,3 +1558,102 @@ body:has(.rosa-home-dark) .rosa-settings-panel button { color: #eee7ff; }
 @media (prefers-reduced-motion: reduce) {
   .rosa-loading-screen, .rosa-loading-brand, .rosa-loading-line i { animation: none; }
 }
+
+
+/* Compact note tiles and playful raised navigation interaction */
+.rosa-note-grid > a {
+  height: 238px;
+  aspect-ratio: auto;
+}
+@media (min-width: 640px) {
+  .rosa-note-grid > a { height: 248px; }
+}
+.rosa-note-grid .rosa-card-emoji {
+  top: .7rem;
+  right: .7rem;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 1rem;
+  font-size: 1.55rem;
+  box-shadow: 0 1px 0 oklch(1 0 0 / 30%) inset, 0 10px 24px -12px oklch(0.08 0.03 285 / 52%);
+  transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s ease, background .3s ease;
+}
+.rosa-note-grid > a:hover .rosa-card-emoji {
+  transform: translateY(-3px) scale(1.08) rotate(-5deg);
+  background: linear-gradient(145deg, oklch(1 0 0 / 34%), oklch(0.78 0.12 292 / 22%));
+  box-shadow: 0 1px 0 oklch(1 0 0 / 42%) inset, 0 12px 28px -12px oklch(0.72 0.18 295 / 70%);
+}
+
+/* Floating icon bubble inspired by the supplied mobile navigation reference */
+.rosa-sidebar .rosa-rail-link {
+  position: relative;
+  isolation: isolate;
+  min-height: 4.2rem;
+  overflow: visible;
+  transition: color .28s ease, background .28s ease, transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s ease;
+}
+.rosa-rail-icon {
+  position: relative;
+  display: grid;
+  width: 2.55rem;
+  height: 2.55rem;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: currentColor;
+  transition: transform .32s cubic-bezier(.2,.8,.2,1), background .32s ease, border-color .32s ease, box-shadow .32s ease;
+}
+.rosa-rail-icon svg {
+  width: 1.3rem;
+  height: 1.3rem;
+  transition: transform .32s cubic-bezier(.2,.8,.2,1), stroke-width .25s ease;
+}
+.rosa-rail-label {
+  display: block;
+  transition: transform .28s ease, color .28s ease;
+}
+.rosa-sidebar .rosa-rail-link:hover,
+.rosa-sidebar .rosa-rail-link:focus-visible {
+  z-index: 2;
+  color: oklch(0.98 0.035 292);
+  background: transparent;
+  transform: translateY(-2px);
+}
+.rosa-sidebar .rosa-rail-link:hover .rosa-rail-icon,
+.rosa-sidebar .rosa-rail-link:focus-visible .rosa-rail-icon,
+.rosa-sidebar .rosa-rail-link.is-active .rosa-rail-icon {
+  transform: translateY(-5px) scale(1.12);
+  border-color: oklch(1 0 0 / 64%);
+  color: #fff;
+  background:
+    linear-gradient(145deg, oklch(1 0 0 / 92%), oklch(0.9 0.84 295 / 88%));
+  box-shadow:
+    0 1px 0 #fff inset,
+    0 0 0 4px oklch(0.62 0.18 292 / 24%),
+    0 9px 20px -8px oklch(0.72 0.2 295 / 82%);
+}
+.rosa-sidebar .rosa-rail-link:hover .rosa-rail-icon svg,
+.rosa-sidebar .rosa-rail-link:focus-visible .rosa-rail-icon svg,
+.rosa-sidebar .rosa-rail-link.is-active .rosa-rail-icon svg {
+  color: oklch(0.42 0.16 292);
+  transform: scale(1.13);
+  stroke-width: 2.1;
+}
+.rosa-sidebar .rosa-rail-link.is-active .rosa-rail-label {
+  color: oklch(0.96 0.06 292);
+}
+.rosa-sidebar button.rosa-rail-link:hover .rosa-rail-icon {
+  background: linear-gradient(145deg, oklch(1 0 0 / 92%), oklch(0.9 0.84 295 / 88%));
+}
+@media (max-width: 640px) {
+  .rosa-sidebar .rosa-rail-link { min-height: 3.6rem; }
+  .rosa-rail-icon { width: 2.3rem; height: 2.3rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rosa-note-grid .rosa-card-emoji,
+  .rosa-sidebar .rosa-rail-link,
+  .rosa-rail-icon,
+  .rosa-rail-icon svg,
+  .rosa-rail-label { transition: none; }
+}
