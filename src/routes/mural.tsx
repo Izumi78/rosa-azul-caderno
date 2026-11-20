@@ -35,14 +35,18 @@ const STROKE: Record<NoteColor, string> = {
 };
 
 function curve(x1: number, y1: number, x2: number, y2: number) {
-  const mx = (x1 + x2) / 2;
-  const my = (y1 + y2) / 2;
   const dx = x2 - x1;
   const dy = y2 - y1;
-  // bend perpendicular to the line for a hand-drawn string feel
-  const cx = mx - dy * 0.15;
-  const cy = my + dx * 0.15;
-  return `M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`;
+  const distance = Math.hypot(dx, dy);
+  const bend = Math.min(150, Math.max(42, distance * 0.2));
+  const nx = distance ? -dy / distance : 0;
+  const ny = distance ? dx / distance : 0;
+  const direction = dx >= 0 ? 1 : -1;
+  const c1x = x1 + dx * 0.32 + nx * bend * direction;
+  const c1y = y1 + dy * 0.32 + ny * bend * direction;
+  const c2x = x2 - dx * 0.32 + nx * bend * direction;
+  const c2y = y2 - dy * 0.32 + ny * bend * direction;
+  return `M ${x1} ${y1} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${x2} ${y2}`;
 }
 
 function MuralPage() {
@@ -119,8 +123,8 @@ function MuralPage() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] flex-col">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-background/80 px-4 py-3 sm:px-6">
+    <div className="rosa-mural-page flex h-[calc(100vh-4rem)] flex-col">
+      <div className="rosa-mural-header flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3 sm:px-6">
         <div>
           <h1 className="text-2xl font-semibold">Mural de ideias</h1>
           <p className="text-sm text-muted-foreground">
@@ -147,7 +151,7 @@ function MuralPage() {
         </div>
       </div>
 
-      <div className="rosa-mural-canvas relative min-h-0 flex-1 overflow-auto paper-grid">
+      <div className="rosa-mural-canvas rosa-mural-stage relative min-h-0 flex-1 overflow-auto">
         {!hydrated ? (
           <div className="p-10">
             <Skeleton className="h-32 w-56 bg-secondary" />
@@ -225,7 +229,7 @@ function MuralPage() {
                   onPointerUp={() => onCardPointerUp(n.id)}
                   onKeyDown={(e) => e.key === "Enter" && onCardPointerUp(n.id)}
                   className={cn(
-                    "rosa-mural-card group absolute flex touch-none select-none flex-col overflow-hidden rounded-2xl border border-white/25 bg-paper/55 p-4 pl-5 shadow-paper backdrop-blur-xl transition-shadow animate-fade-up hover:shadow-lift",
+                    "rosa-mural-card group absolute flex touch-none select-none flex-col overflow-hidden rounded-[1.35rem] border p-4 pl-5 backdrop-blur-xl transition-all duration-300 animate-fade-up",
                     linking ? "cursor-crosshair" : "cursor-grab active:cursor-grabbing",
                     isSel && "ring-2 ring-primary ring-offset-2 ring-offset-background",
                   )}
