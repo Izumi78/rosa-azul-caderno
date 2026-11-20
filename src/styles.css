@@ -300,9 +300,7 @@
 }
 .rosa-note-glass {
   background-color: color-mix(in oklab, var(--paper) 78%, white);
-  background-image:
-    linear-gradient(135deg, color-mix(in oklab, white 48%, transparent), transparent 65%),
-    var(--paper-ruled-image, none);
+  background-image: linear-gradient(135deg, color-mix(in oklab, white 28%, transparent), transparent 65%);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-color: color-mix(in oklab, var(--primary) 14%, var(--border));
