@@ -147,7 +147,7 @@ function MuralPage() {
         </div>
       </div>
 
-      <div className="relative min-h-0 flex-1 overflow-auto paper-grid">
+      <div className="rosa-mural-canvas relative min-h-0 flex-1 overflow-auto paper-grid">
         {!hydrated ? (
           <div className="p-10">
             <Skeleton className="h-32 w-56 bg-secondary" />
@@ -160,7 +160,7 @@ function MuralPage() {
             onPointerMove={(e) => linking && selected && setCursor(canvasPoint(e))}
             onPointerLeave={() => setCursor(null)}
           >
-            <svg className="pointer-events-none absolute inset-0" width={width} height={height}>
+            <svg className="rosa-synapse-svg pointer-events-none absolute inset-0" width={width} height={height}>
               {connections.map((c) => {
                 const a = byId.get(c.from);
                 const b = byId.get(c.to);
@@ -174,16 +174,10 @@ function MuralPage() {
                 const hovered = hoverLine === c.id;
                 return (
                   <g key={c.id}>
-                    <path
-                      d={d}
-                      fill="none"
-                      stroke={STROKE[a.color]}
-                      strokeWidth={hovered ? 4 : 2.5}
-                      strokeLinecap="round"
-                      strokeDasharray={hovered ? "6 6" : undefined}
-                      opacity={hovered ? 1 : 0.75}
-                      className="transition-all"
-                    />
+                    <path d={d} fill="none" stroke={STROKE[a.color]} strokeWidth={hovered ? 3.5 : 2.2} strokeLinecap="round" opacity={hovered ? 0.98 : 0.65} className="rosa-synapse-wire" />
+                    <path d={d} fill="none" stroke="var(--accent)" strokeWidth={1} strokeLinecap="round" strokeDasharray="3 14" opacity={0.85} className="rosa-synapse-pulse" />
+                    <circle cx={a.position.x + CARD_W / 2} cy={a.position.y + CARD_H / 2} r={hovered ? 7 : 5} fill={STROKE[a.color]} className="rosa-synapse-node" />
+                    <circle cx={b.position.x + CARD_W / 2} cy={b.position.y + CARD_H / 2} r={hovered ? 7 : 5} fill={STROKE[b.color]} className="rosa-synapse-node" />
                     <path
                       d={d}
                       fill="none"
@@ -231,7 +225,7 @@ function MuralPage() {
                   onPointerUp={() => onCardPointerUp(n.id)}
                   onKeyDown={(e) => e.key === "Enter" && onCardPointerUp(n.id)}
                   className={cn(
-                    "group absolute flex touch-none select-none flex-col overflow-hidden rounded-lg border border-border bg-paper p-4 pl-5 shadow-paper transition-shadow animate-fade-up hover:shadow-lift",
+                    "rosa-mural-card group absolute flex touch-none select-none flex-col overflow-hidden rounded-2xl border border-white/25 bg-paper/55 p-4 pl-5 shadow-paper backdrop-blur-xl transition-shadow animate-fade-up hover:shadow-lift",
                     linking ? "cursor-crosshair" : "cursor-grab active:cursor-grabbing",
                     isSel && "ring-2 ring-primary ring-offset-2 ring-offset-background",
                   )}
@@ -244,8 +238,8 @@ function MuralPage() {
                   }}
                 >
                   <span className={cn("absolute inset-y-0 left-0 w-1.5", NOTE_COLOR_BG[n.color])} />
-                  <p className="line-clamp-2 font-display text-lg font-semibold leading-snug text-foreground">{n.title}</p>
-                  <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{n.description || "Sem descrição"}</p>
+                  {n.coverImage && <img src={n.coverImage} alt="" className="absolute inset-0 h-full w-full object-cover opacity-25" />}\n                  <span className="rosa-mural-card-gloss absolute inset-0" />\n                  <span className="relative z-10 mb-1 text-xl">{n.emoji || "🌷"}</span>\n                  <p className="relative z-10 line-clamp-2 font-display text-lg font-semibold leading-snug text-foreground">{n.title}</p>
+                  <p className="relative z-10 mt-1 line-clamp-2 text-xs text-muted-foreground">{n.description || "Sem descrição"}</p>
                 </div>
               );
             })}
