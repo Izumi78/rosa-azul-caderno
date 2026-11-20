@@ -131,9 +131,9 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <div className="flex min-h-screen flex-col">
+      <div className="rosa-app-shell min-h-screen">
         <SiteHeader />
-        <main className="flex-1">
+        <main className="rosa-main-content min-h-[calc(100vh-4.5rem)]">
           <Outlet />
         </main>
       </div>
