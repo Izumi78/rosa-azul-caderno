@@ -3,7 +3,7 @@ import { useEffect, useState, type CSSProperties } from "react";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 
-import { getMediaFile, getMediaId } from "@/lib/image-utils";
+import { getMediaFile, getMediaId, downloadMediaFromCloud } from "@/lib/image-utils";
 import { cn } from "@/lib/utils";
 import { ChartBlock } from "./chart-block";
 
@@ -26,12 +26,14 @@ function StoredMedia({ reference, alt = "" }: { reference: string; alt?: string 
     let objectUrl = "";
     const id = getMediaId(reference);
     if (!id) { setFailed(true); return; }
-    getMediaFile(id).then((file) => {
+    void (async () => {
+      let file = await getMediaFile(id);
+      if (!file) file = await downloadMediaFromCloud(id);
       if (!active) return;
       if (!file) { setFailed(true); return; }
       objectUrl = URL.createObjectURL(file.blob);
       setAsset({ url: objectUrl, type: file.type, name: file.name });
-    }).catch(() => { if (active) setFailed(true); });
+    })().catch(() => { if (active) setFailed(true); });
     return () => { active = false; if (objectUrl) URL.revokeObjectURL(objectUrl); };
   }, [reference]);
   if (failed) return <span className="text-sm text-muted-foreground">Arquivo não encontrado neste navegador.</span>;
