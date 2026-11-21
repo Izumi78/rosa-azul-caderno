@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { LayoutGrid, Waypoints, CalendarDays, Settings2, Columns3 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Wordmark } from "./logo";
-import { ProfileAvatar } from "./profile-avatar";
+import { ProfileAvatar } from "./profile-avatar";\nimport { AccountControl } from "@/lib/supabase-cloud";
 
 const itemClass = "rosa-rail-link group flex w-full flex-col items-center justify-center gap-1.5 rounded-2xl px-2 py-3 text-[10px] font-semibold tracking-wide text-muted-foreground transition-all hover:bg-accent/70 hover:text-foreground";
 export function SiteHeader() {
@@ -18,7 +18,7 @@ export function SiteHeader() {
         <Link to="/" aria-label="Rosa Azul — início" className="rosa-topbar-brand flex items-center justify-center">
           <Wordmark />
         </Link>
-        <span className="absolute right-5 hidden items-center gap-2 text-[10px] font-semibold uppercase tracking-[.18em] text-muted-foreground sm:flex"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_10px_2px_oklch(0.75_0.16_150_/_45%)]" /> seu espaço criativo</span>
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 sm:right-5"><AccountControl /></div>
       </header>
       <aside className="rosa-sidebar fixed bottom-0 left-0 top-[4.5rem] z-30 flex w-[4.25rem] flex-col items-center gap-1.5 border-r border-border/70 px-1.5 py-4">
         <Link to="/" activeOptions={{ exact: true }} className={itemClass} activeProps={{ className: "is-active" }}><span className="rosa-rail-icon"><LayoutGrid className="h-5 w-5" /></span><span className="rosa-rail-label">Blocos</span></Link>
