@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from "react";
 import { cloudLoad, cloudSave, currentSession } from "./supabase-cloud";
+import { syncNoteMediaToCloud } from "./image-utils";
 
 import {
   addNote,
@@ -29,7 +30,7 @@ let syncing = false;
 function scheduleCloudSave() {
   if (!currentSession() || !state.hydrated) return;
   clearTimeout(syncTimer);
-  syncTimer = setTimeout(() => { void cloudSave({ notes: state.notes, connections: state.connections }).catch(() => {}); }, 800);
+  syncTimer = setTimeout(() => { void (async () => { await cloudSave({ notes: state.notes, connections: state.connections }); await syncNoteMediaToCloud(state.notes); })().catch(() => {}); }, 800);
 }
 function syncFromAccount() {
   if (!currentSession() || !state.hydrated || syncing) return;
