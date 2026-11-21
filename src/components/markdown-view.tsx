@@ -3,7 +3,7 @@ import { useEffect, useState, type CSSProperties } from "react";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 
-import { getMediaFile, getMediaId, downloadMediaFromCloud } from "@/lib/image-utils";
+import { getMediaId, loadMedia } from "@/lib/image-utils";
 import { cn } from "@/lib/utils";
 import { ChartBlock } from "./chart-block";
 
@@ -27,8 +27,7 @@ function StoredMedia({ reference, alt = "" }: { reference: string; alt?: string 
     const id = getMediaId(reference);
     if (!id) { setFailed(true); return; }
     void (async () => {
-      let file = await getMediaFile(id);
-      if (!file) file = await downloadMediaFromCloud(id);
+      const file = await loadMedia(id);
       if (!active) return;
       if (!file) { setFailed(true); return; }
       objectUrl = URL.createObjectURL(file.blob);
@@ -36,7 +35,7 @@ function StoredMedia({ reference, alt = "" }: { reference: string; alt?: string 
     })().catch(() => { if (active) setFailed(true); });
     return () => { active = false; if (objectUrl) URL.revokeObjectURL(objectUrl); };
   }, [reference]);
-  if (failed) return <span className="text-sm text-muted-foreground">Arquivo não encontrado neste navegador.</span>;
+  if (failed) return <span className="text-sm text-muted-foreground">Arquivo não encontrado. Entre na sua conta para ver arquivos salvos em outros aparelhos.</span>;
   if (!asset) return <span className="my-3 inline-flex rounded-lg bg-secondary px-3 py-2 text-sm text-muted-foreground">Carregando mídia…</span>;
   if (asset.type.startsWith("video/")) return <video src={asset.url} controls preload="metadata" playsInline aria-label={alt || asset.name} className="my-4 max-h-[520px] w-full rounded-xl border border-border bg-black" />;
   if (asset.type.startsWith("image/")) return <img src={asset.url} alt={alt || asset.name} loading="lazy" className="my-4 max-h-[600px] max-w-full rounded-lg border border-border object-contain" />;

@@ -234,3 +234,46 @@ Cada bloco é uma página inteira para escrever.
     ],
   };
 }
+
+const SAMPLE_IDS = new Set(["boas-vindas", "ideias-projeto", "leituras"]);
+
+/** True when the notebook only holds the starter notes shown to first-time visitors. */
+export function isOnlySampleData(data: NotesData): boolean {
+  return data.notes.every((n) => SAMPLE_IDS.has(n.id));
+}
+
+/**
+ * Combines notes from this device with notes saved in the account.
+ * Every note from both sides is kept; when the same note exists on both, the most recently edited copy wins.
+ * Board connections are combined too, dropping duplicates and links to notes that no longer exist.
+ */
+export function mergeNotesData(local: NotesData, cloud: NotesData): NotesData {
+  const byId = new Map<string, Note>();
+  for (const note of cloud.notes) byId.set(note.id, note);
+  for (const note of local.notes) {
+    const other = byId.get(note.id);
+    if (!other || (note.updatedAt ?? 0) > (other.updatedAt ?? 0)) byId.set(note.id, note);
+  }
+  const notes = [...byId.values()].sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
+  const seen = new Set<string>();
+  const connections: Connection[] = [];
+  for (const c of [...cloud.connections, ...local.connections]) {
+    if (!byId.has(c.from) || !byId.has(c.to)) continue;
+    const key = [c.from, c.to].sort().join("|");
+    if (seen.has(key)) continue;
+    seen.add(key);
+    connections.push(c);
+  }
+  return { notes, connections };
+}
+
+/** Lists every stored photo, video or file a note points to (content, cover or visual layout). */
+export function collectMediaIds(notes: Note[]): string[] {
+  const ids = new Set<string>();
+  for (const note of notes) {
+    for (const match of JSON.stringify(note).matchAll(/rosa-media:\/\/([a-zA-Z0-9-]+)/g)) {
+      if (match[1]) ids.add(match[1]);
+    }
+  }
+  return [...ids];
+}

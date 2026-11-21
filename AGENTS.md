@@ -31,6 +31,8 @@ use the editor.
 
 ## Project rules
 
-- Notes, links, AI chat history and board connections live in browser localStorage via `src/lib/notes-store.ts`; pure data rules sit in `src/lib/notes-model.ts` (tested). Why: no login yet, and keeping rules pure makes a later move to a cloud database a store-only change.
+- Notes live in browser localStorage via `src/lib/notes-store.ts` and, when signed in, sync to the Lovable Cloud `user_notes` row (one JSON row per user); merge rules sit in `src/lib/notes-model.ts` (tested). A browser never pushes to an account before it has pulled and merged it once. Why: works offline/signed-out and keeps device-to-device sync a store-only concern.
+- Photos, videos and files are stored in IndexedDB as `rosa-media://<id>` and uploaded to the private `note-media` bucket under `<userId>/<id>`; components open them through `loadMedia()` (local first, then account). Why: notes JSON stays small and media follows the account.
+- Auth goes through `src/lib/supabase-cloud.ts` (generated client + Lovable Google broker); the UI is `src/components/account-control.tsx`. Why: one place owns session state and the auth-change event the store listens to.
 - The AI assistant streams through the server route `src/routes/api/chat.ts`, which lazy-imports `src/lib/ai-chat.server.ts` (Lovable AI Gateway SDK). Why: keeps the SDK and key server-side.
 - AI charts are fenced ```chart JSON blocks rendered by `ChartBlock` inside `MarkdownView`, so charts work both in chat and in a note's preview. Why: one format the model can emit and the note can store as plain text.

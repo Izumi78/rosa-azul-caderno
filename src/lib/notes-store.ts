@@ -1,10 +1,13 @@
 import { useSyncExternalStore } from "react";
-import { cloudLoad, cloudSave, currentSession } from "./supabase-cloud";
+import { AUTH_EVENT, cloudLoad, cloudSave, currentSession } from "./supabase-cloud";
 import { syncNoteMediaToCloud } from "./image-utils";
 
 import {
   addNote,
+  collectMediaIds,
   deleteNote,
+  isOnlySampleData,
+  mergeNotesData,
   moveNote,
   removeConnection,
   sampleData,
@@ -16,10 +19,13 @@ import {
 } from "./notes-model";
 
 const STORAGE_KEY = "rosa-azul:v1";
+const SYNC_META_KEY = "rosa-azul:sync";
 
 interface StoreState extends NotesData {
   hydrated: boolean;
 }
+
+export type SyncStatus = "local" | "syncing" | "synced" | "error";
 
 const SERVER_STATE: StoreState = { hydrated: false, notes: [], connections: [] };
 let state: StoreState = SERVER_STATE;
@@ -27,23 +33,109 @@ const listeners = new Set<() => void>();
 let saveTimer: ReturnType<typeof setTimeout> | undefined;
 let syncTimer: ReturnType<typeof setTimeout> | undefined;
 let syncing = false;
+let syncStatus: SyncStatus = "local";
+const statusListeners = new Set<() => void>();
+
+function setStatus(next: SyncStatus) {
+  if (syncStatus === next) return;
+  syncStatus = next;
+  for (const l of statusListeners) l();
+}
+
+export function useSyncStatus(): SyncStatus {
+  return useSyncExternalStore(
+    (l) => { statusListeners.add(l); return () => statusListeners.delete(l); },
+    () => syncStatus,
+    () => "local" as SyncStatus,
+  );
+}
+
+/** Remembers which account this browser last synced with and whether it has edits not yet sent. */
+function readMeta(): { userId?: string; dirty?: boolean } {
+  try { return JSON.parse(localStorage.getItem(SYNC_META_KEY) || "{}") as { userId?: string; dirty?: boolean }; } catch { return {}; }
+}
+function writeMeta(meta: { userId?: string; dirty?: boolean }) {
+  try { localStorage.setItem(SYNC_META_KEY, JSON.stringify(meta)); } catch { /* ignore */ }
+}
+
+function currentData(): NotesData {
+  return { notes: state.notes, connections: state.connections };
+}
+
+async function pushNow(force = false) {
+  const s = currentSession();
+  if (!s) return;
+  // Never overwrite an account before this browser has read (and merged) what it already holds.
+  if (!force && readMeta().userId !== s.user.id) { void pullFromCloud(); return; }
+  setStatus("syncing");
+  try {
+    const data = currentData();
+    await cloudSave(data);
+    writeMeta({ userId: s.user.id, dirty: false });
+    setStatus("synced");
+    await syncNoteMediaToCloud(collectMediaIds(data.notes));
+  } catch {
+    setStatus("error");
+  }
+}
+
 function scheduleCloudSave() {
-  if (!currentSession() || !state.hydrated) return;
+  const s = currentSession();
+  if (!s || !state.hydrated) return;
+  writeMeta({ ...readMeta(), dirty: true });
   clearTimeout(syncTimer);
-  syncTimer = setTimeout(() => { void (async () => { await cloudSave({ notes: state.notes, connections: state.connections }); await syncNoteMediaToCloud(state.notes); })().catch(() => {}); }, 800);
+  syncTimer = setTimeout(function run() {
+    if (syncing) { syncTimer = setTimeout(run, 500); return; }
+    void pushNow();
+  }, 1000);
 }
-function syncFromAccount() {
-  if (!currentSession() || !state.hydrated || syncing) return;
+
+/** Brings the account's notes into this browser (merging the first time, or when this browser has unsent edits). */
+async function pullFromCloud() {
+  const s = currentSession();
+  if (!s || !state.hydrated || syncing) return;
   syncing = true;
-  void cloudLoad().then((cloud) => {
-    if (cloud && Array.isArray(cloud.notes) && Array.isArray(cloud.connections)) {
-      const localHasData = state.notes.length > 0 && !state.notes.every((n) => n.id === "boas-vindas" || n.id === "ideias-projeto" || n.id === "leituras");
-      if (!localHasData) { state = { ...state, notes: cloud.notes, connections: cloud.connections }; emit(); persist(); }
-      else scheduleCloudSave();
-    } else scheduleCloudSave();
-  }).catch(() => {}).finally(() => { syncing = false; });
+  setStatus("syncing");
+  try {
+    const before = state;
+    const cloud = await cloudLoad();
+    if (currentSession()?.user.id !== s.user.id) return;
+    const meta = readMeta();
+    const local = currentData();
+    const needsMerge = meta.userId !== s.user.id || meta.dirty || state !== before;
+    if (!cloud) {
+      await pushNow(true);
+      return;
+    }
+    const cloudData: NotesData = { notes: cloud.notes, connections: cloud.connections };
+    const next = !needsMerge || isOnlySampleData(local) ? cloudData : mergeNotesData(local, cloudData);
+    state = { ...next, hydrated: true };
+    emit();
+    try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+    if (needsMerge && !isOnlySampleData(local)) await pushNow(true);
+    else { writeMeta({ userId: s.user.id, dirty: false }); setStatus("synced"); }
+  } catch {
+    setStatus("error");
+  } finally {
+    syncing = false;
+  }
 }
-if (typeof window !== "undefined") window.addEventListener("rosa-auth-change", syncFromAccount);
+
+if (typeof window !== "undefined") {
+  window.addEventListener(AUTH_EVENT, () => {
+    if (currentSession()) void pullFromCloud();
+    else setStatus("local");
+  });
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && !readMeta().dirty) void pullFromCloud();
+  });
+}
+
+/** Manually re-syncs with the account (used by the "Sincronizar agora" button). */
+export function syncNow() {
+  if (readMeta().dirty) void pushNow();
+  else void pullFromCloud();
+}
 
 function emit() {
   for (const l of listeners) l();
@@ -56,10 +148,10 @@ function persist() {
     const { notes, connections } = state;
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ notes, connections }));
-      scheduleCloudSave();
     } catch {
       // storage full or blocked; keep working in memory
     }
+    scheduleCloudSave();
   }, 250);
 }
 
@@ -91,6 +183,7 @@ export function hydrateNotes() {
   } else {
     set(sampleData());
   }
+  if (currentSession()) void pullFromCloud();
 }
 
 function subscribe(l: () => void) {
@@ -115,7 +208,7 @@ export const notesActions = {
   restoreBackup(data: NotesData) {
     set({ notes: data.notes, connections: data.connections });
   },
-  create(input: { title: string; description: string; color?: NoteColor }): Note {
+  create(input: { title: string; description: string; color?: NoteColor; emoji?: string; coverImage?: string }): Note {
     const { data, note } = addNote(state, input);
     set(data);
     return note;

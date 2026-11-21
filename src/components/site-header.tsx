@@ -3,7 +3,7 @@ import { LayoutGrid, Waypoints, CalendarDays, Settings2, Columns3 } from "lucide
 import { useEffect, useState } from "react";
 import { Wordmark } from "./logo";
 import { ProfileAvatar } from "./profile-avatar";
-import { AccountControl } from "@/lib/supabase-cloud";
+import { AccountControl } from "./account-control";
 
 const itemClass = "rosa-rail-link group flex w-full flex-col items-center justify-center gap-1.5 rounded-2xl px-2 py-3 text-[10px] font-semibold tracking-wide text-muted-foreground transition-all hover:bg-accent/70 hover:text-foreground";
 export function SiteHeader() {

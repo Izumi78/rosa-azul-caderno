@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CalendarioRouteImport } from './routes/calendario'
 import { Route as MuralRouteImport } from './routes/mural'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as TarefasRouteImport } from './routes/tarefas'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as NotaIdRouteImport } from './routes/nota.$id'
@@ -29,6 +30,11 @@ const CalendarioRoute = CalendarioRouteImport.update({
 const MuralRoute = MuralRouteImport.update({
   id: '/mural',
   path: '/mural',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TarefasRoute = TarefasRouteImport.update({
@@ -51,6 +57,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/calendario': typeof CalendarioRoute
   '/mural': typeof MuralRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/tarefas': typeof TarefasRoute
   '/api/chat': typeof ApiChatRoute
   '/nota/$id': typeof NotaIdRoute
@@ -59,6 +66,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/calendario': typeof CalendarioRoute
   '/mural': typeof MuralRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/tarefas': typeof TarefasRoute
   '/api/chat': typeof ApiChatRoute
   '/nota/$id': typeof NotaIdRoute
@@ -68,6 +76,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/calendario': typeof CalendarioRoute
   '/mural': typeof MuralRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/tarefas': typeof TarefasRoute
   '/api/chat': typeof ApiChatRoute
   '/nota/$id': typeof NotaIdRoute
@@ -75,14 +84,28 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/calendario' | '/mural' | '/tarefas' | '/api/chat' | '/nota/$id'
+    | '/'
+    | '/calendario'
+    | '/mural'
+    | '/reset-password'
+    | '/tarefas'
+    | '/api/chat'
+    | '/nota/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/calendario' | '/mural' | '/tarefas' | '/api/chat' | '/nota/$id'
+  to:
+    | '/'
+    | '/calendario'
+    | '/mural'
+    | '/reset-password'
+    | '/tarefas'
+    | '/api/chat'
+    | '/nota/$id'
   id:
     | '__root__'
     | '/'
     | '/calendario'
     | '/mural'
+    | '/reset-password'
     | '/tarefas'
     | '/api/chat'
     | '/nota/$id'
@@ -92,6 +115,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CalendarioRoute: typeof CalendarioRoute
   MuralRoute: typeof MuralRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   TarefasRoute: typeof TarefasRoute
   ApiChatRoute: typeof ApiChatRoute
   NotaIdRoute: typeof NotaIdRoute
@@ -118,6 +142,13 @@ declare module '@tanstack/react-router' {
       path: '/mural'
       fullPath: '/mural'
       preLoaderRoute: typeof MuralRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tarefas': {
@@ -148,6 +179,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CalendarioRoute: CalendarioRoute,
   MuralRoute: MuralRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   TarefasRoute: TarefasRoute,
   ApiChatRoute: ApiChatRoute,
   NotaIdRoute: NotaIdRoute,

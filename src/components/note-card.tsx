@@ -5,7 +5,7 @@ import { ptBR } from "date-fns/locale";
 import { Link2, Waypoints } from "lucide-react";
 
 import type { Note } from "@/lib/notes-model";
-import { getMediaFile, getMediaId } from "@/lib/image-utils";
+import { getMediaId, loadMedia } from "@/lib/image-utils";
 import { cn } from "@/lib/utils";
 
 import { NOTE_COLOR_BG, NOTE_COLOR_TEXT } from "./note-colors";
@@ -17,7 +17,7 @@ function NoteCover({ reference }: { reference: string }) {
     let objectUrl = "";
     const id = getMediaId(reference);
     if (!id) { setSrc(reference.startsWith("data:image/") ? reference : reference); return; }
-    getMediaFile(id).then((file) => {
+    loadMedia(id).then((file) => {
       if (!active || !file) return;
       objectUrl = URL.createObjectURL(file.blob);
       setSrc(objectUrl);

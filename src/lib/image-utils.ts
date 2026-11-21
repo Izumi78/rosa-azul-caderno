@@ -111,42 +111,77 @@ export async function compressImageForNotes(file: File): Promise<string> {
 }
 
 
-/** Uploads a locally stored attachment to the user's private Supabase folder. */
-const SUPABASE_MEDIA_URL = "https://utmcnicgabcmkfmsxzop.supabase.co";
-const SUPABASE_MEDIA_KEY = "sb_publishable_6jQ9EmAD4pJIyPhKsJIK2Q_O8kvnswF";
+const MEDIA_BUCKET = "note-media";
+const uploadedKey = (userId: string) => `rosa-azul:uploaded:${userId}`;
+
+function readUploaded(userId: string): Set<string> {
+  try { return new Set(JSON.parse(localStorage.getItem(uploadedKey(userId)) || "[]") as string[]); } catch { return new Set(); }
+}
+function markUploaded(userId: string, id: string) {
+  const set = readUploaded(userId);
+  set.add(id);
+  try { localStorage.setItem(uploadedKey(userId), JSON.stringify([...set])); } catch { /* ignore */ }
+}
+
+/** Keeps a downloaded file in this browser so it opens instantly next time. */
+async function cacheMediaLocally(media: StoredMedia) {
+  const database = await openMediaDatabase();
+  try {
+    await new Promise<void>((resolve) => {
+      const transaction = database.transaction(STORE_NAME, "readwrite");
+      transaction.objectStore(STORE_NAME).put(media);
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => resolve();
+      transaction.onabort = () => resolve();
+    });
+  } finally { database.close(); }
+}
+
+/** Sends one locally stored photo, video or file to the signed-in account's private folder. */
 export async function uploadMediaToCloud(id: string): Promise<boolean> {
   const { currentSession } = await import("./supabase-cloud");
   const session = currentSession();
   if (!session) return false;
+  if (readUploaded(session.user.id).has(id)) return true;
   const media = await getMediaFile(id);
   if (!media) return false;
-  const path = `${session.user.id}/${id}`;
-  const response = await fetch(`${SUPABASE_MEDIA_URL}/storage/v1/object/rosa-azul-media/${path}`, {
-    method: "POST",
-    headers: { apikey: SUPABASE_MEDIA_KEY, Authorization: `Bearer ${session.access_token}`, "Content-Type": media.type || "application/octet-stream", "x-upsert": "true" },
-    body: media.blob,
+  const { supabase } = await import("@/integrations/supabase/client");
+  const { error } = await supabase.storage.from(MEDIA_BUCKET).upload(`${session.user.id}/${id}`, media.blob, {
+    upsert: true,
+    contentType: media.type || "application/octet-stream",
+    metadata: { name: media.name },
   });
-  if (!response.ok) throw new Error("Não foi possível enviar o anexo para a nuvem.");
+  if (error) throw new Error("Não foi possível enviar o anexo para a nuvem.");
+  markUploaded(session.user.id, id);
   return true;
 }
+
 export async function downloadMediaFromCloud(id: string): Promise<StoredMedia | null> {
   const { currentSession } = await import("./supabase-cloud");
   const session = currentSession();
   if (!session) return null;
-  const response = await fetch(`${SUPABASE_MEDIA_URL}/storage/v1/object/rosa-azul-media/${session.user.id}/${id}`, {
-    headers: { apikey: SUPABASE_MEDIA_KEY, Authorization: `Bearer ${session.access_token}` },
-  });
-  if (response.status === 404) return null;
-  if (!response.ok) throw new Error("Não foi possível baixar o anexo da nuvem.");
-  const blob = await response.blob();
-  return { id, blob, name: id, type: blob.type || "application/octet-stream", createdAt: Date.now() };
+  const { supabase } = await import("@/integrations/supabase/client");
+  const path = `${session.user.id}/${id}`;
+  const { data, error } = await supabase.storage.from(MEDIA_BUCKET).download(path);
+  if (error || !data) return null;
+  let name = id;
+  try {
+    const { data: info } = await supabase.storage.from(MEDIA_BUCKET).info(path);
+    const meta = info?.metadata as { name?: unknown } | undefined;
+    if (meta && typeof meta.name === "string" && meta.name) name = meta.name;
+  } catch { /* name is optional */ }
+  const media: StoredMedia = { id, blob: data, name, type: data.type || "application/octet-stream", createdAt: Date.now() };
+  markUploaded(session.user.id, id);
+  void cacheMediaLocally(media).catch(() => {});
+  return media;
 }
-export async function syncNoteMediaToCloud(notes: Array<{content?: string; coverImage?: string}>) {
-  const ids = new Set<string>();
-  for (const note of notes) {
-    for (const match of (note.content || "").matchAll(/rosa-media:\/\/([a-zA-Z0-9-]+)/g)) ids.add(match[1]);
-    const coverId = note.coverImage ? getMediaId(note.coverImage) : null;
-    if (coverId) ids.add(coverId);
-  }
+
+/** Opens a stored file from this browser, or from the account when it was added on another device. */
+export async function loadMedia(id: string): Promise<StoredMedia | null> {
+  const local = await getMediaFile(id).catch(() => null);
+  return local ?? (await downloadMediaFromCloud(id));
+}
+
+export async function syncNoteMediaToCloud(ids: string[]) {
   for (const id of ids) { try { await uploadMediaToCloud(id); } catch { /* Retry on a later sync. */ } }
 }

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { ImagePlus, Plus, Trash2, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getMediaFile, getMediaId, saveMediaFile, compressImageBlobForNotes } from "@/lib/image-utils";
+import { getMediaId, loadMedia, saveMediaFile, compressImageBlobForNotes } from "@/lib/image-utils";
 
 export type VisualElement = {
   id: string;
@@ -23,7 +23,7 @@ function MediaPreview({ reference }: { reference: string }) {
     setFailed(false);
     const id = getMediaId(reference);
     if (!id) { setFailed(true); return; }
-    getMediaFile(id).then((stored) => {
+    loadMedia(id).then((stored) => {
       if (!active) return;
       if (!stored) { setFailed(true); return; }
       objectUrl = URL.createObjectURL(stored.blob);
