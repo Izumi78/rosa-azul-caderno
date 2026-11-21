@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from "react";
+import { useSyncExternalStore } from "react";\nimport { cloudLoad, cloudSave, currentSession } from "./supabase-cloud";
 
 import {
   addNote,
@@ -22,7 +22,7 @@ interface StoreState extends NotesData {
 const SERVER_STATE: StoreState = { hydrated: false, notes: [], connections: [] };
 let state: StoreState = SERVER_STATE;
 const listeners = new Set<() => void>();
-let saveTimer: ReturnType<typeof setTimeout> | undefined;
+let saveTimer: ReturnType<typeof setTimeout> | undefined;\nlet syncTimer: ReturnType<typeof setTimeout> | undefined;\nlet syncing = false;\nfunction scheduleCloudSave() {\n  if (!currentSession() || !state.hydrated) return;\n  clearTimeout(syncTimer);\n  syncTimer = setTimeout(() => { void cloudSave({ notes: state.notes, connections: state.connections }).catch(() => {}); }, 800);\n}\nfunction syncFromAccount() {\n  if (!currentSession() || !state.hydrated || syncing) return;\n  syncing = true;\n  void cloudLoad().then((cloud) => {\n    if (cloud && Array.isArray(cloud.notes) && Array.isArray(cloud.connections)) {\n      const localHasData = state.notes.length > 0 && !state.notes.every((n) => n.id === "boas-vindas" || n.id === "ideias-projeto" || n.id === "leituras");\n      if (!localHasData) { state = { ...state, notes: cloud.notes, connections: cloud.connections }; emit(); persist(); }\n      else scheduleCloudSave();\n    } else scheduleCloudSave();\n  }).catch(() => {}).finally(() => { syncing = false; });\n}\nif (typeof window !== "undefined") window.addEventListener("rosa-auth-change", syncFromAccount);
 
 function emit() {
   for (const l of listeners) l();
@@ -34,7 +34,7 @@ function persist() {
   saveTimer = setTimeout(() => {
     const { notes, connections } = state;
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ notes, connections }));
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ notes, connections }));\n      scheduleCloudSave();
     } catch {
       // storage full or blocked; keep working in memory
     }
