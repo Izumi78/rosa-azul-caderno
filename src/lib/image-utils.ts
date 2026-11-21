@@ -109,3 +109,44 @@ export async function compressImageForNotes(file: File): Promise<string> {
     reader.readAsDataURL(blob);
   });
 }
+
+
+/** Uploads a locally stored attachment to the user's private Supabase folder. */
+const SUPABASE_MEDIA_URL = "https://utmcnicgabcmkfmsxzop.supabase.co";
+const SUPABASE_MEDIA_KEY = "sb_publishable_6jQ9EmAD4pJIyPhKsJIK2Q_O8kvnswF";
+export async function uploadMediaToCloud(id: string): Promise<boolean> {
+  const { currentSession } = await import("./supabase-cloud");
+  const session = currentSession();
+  if (!session) return false;
+  const media = await getMediaFile(id);
+  if (!media) return false;
+  const path = `${session.user.id}/${id}`;
+  const response = await fetch(`${SUPABASE_MEDIA_URL}/storage/v1/object/rosa-azul-media/${path}`, {
+    method: "POST",
+    headers: { apikey: SUPABASE_MEDIA_KEY, Authorization: `Bearer ${session.access_token}`, "Content-Type": media.type || "application/octet-stream", "x-upsert": "true" },
+    body: media.blob,
+  });
+  if (!response.ok) throw new Error("Não foi possível enviar o anexo para a nuvem.");
+  return true;
+}
+export async function downloadMediaFromCloud(id: string): Promise<StoredMedia | null> {
+  const { currentSession } = await import("./supabase-cloud");
+  const session = currentSession();
+  if (!session) return null;
+  const response = await fetch(`${SUPABASE_MEDIA_URL}/storage/v1/object/rosa-azul-media/${session.user.id}/${id}`, {
+    headers: { apikey: SUPABASE_MEDIA_KEY, Authorization: `Bearer ${session.access_token}` },
+  });
+  if (response.status === 404) return null;
+  if (!response.ok) throw new Error("Não foi possível baixar o anexo da nuvem.");
+  const blob = await response.blob();
+  return { id, blob, name: id, type: blob.type || "application/octet-stream", createdAt: Date.now() };
+}
+export async function syncNoteMediaToCloud(notes: Array<{content?: string; coverImage?: string}>) {
+  const ids = new Set<string>();
+  for (const note of notes) {
+    for (const match of (note.content || "").matchAll(/rosa-media:\/\/([a-zA-Z0-9-]+)/g)) ids.add(match[1]);
+    const coverId = note.coverImage ? getMediaId(note.coverImage) : null;
+    if (coverId) ids.add(coverId);
+  }
+  for (const id of ids) { try { await uploadMediaToCloud(id); } catch { /* Retry on a later sync. */ } }
+}
